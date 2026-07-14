@@ -337,6 +337,30 @@ function bindForm() {
   $('#btn-exemplo').addEventListener('click', carregarExemplo);
 }
 
+/* ---------- Calculadora: carga horária quebrada no mês ---------- */
+function bindCalculadora() {
+  const bJ = $('#calc-jornada'), bD = $('#calc-dias'), out = $('#calc-resultado');
+  bJ.value = state.jornada; // pré-preenche com a jornada selecionada
+
+  const calc = () => {
+    const j = Number(bJ.value) || 0;
+    let d = Math.floor(Number(bD.value) || 0);
+    if (j <= 0 || d <= 0) {
+      out.innerHTML = '<span style="color:#8a94a3">Informe a jornada e o nº de dias.</span>';
+      return;
+    }
+    if (d > 30) d = 30;
+    const exato = (j / 30) * d;
+    const horas = Math.round(exato);
+    out.innerHTML = `<span class="num">${horas}</span> horas ` +
+      `<small>&nbsp;( ${j} ÷ 30 × ${d} = ${exato.toFixed(2)} )</small>`;
+  };
+
+  $('#btn-calcular').addEventListener('click', calc);
+  bD.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); });
+  bJ.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); });
+}
+
 function limpar() {
   if (!confirm('Limpar todos os dados do mapa?')) return;
   localStorage.removeItem(STORAGE_KEY);
@@ -387,6 +411,7 @@ function init() {
     state.mesFinal = defaultMesFinal();
   }
   bindForm();
+  bindCalculadora();
   sincronizarForm();
   renderEntrada();
   renderMapa();

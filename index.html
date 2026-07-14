@@ -120,6 +120,26 @@
         horas-aula (Anexo I), exceto em regime de 40 horas.
       </div>
 
+      <div class="calc-card">
+        <h2 class="panel__title">🧮 Calculadora — carga horária quebrada no mês</h2>
+        <p class="calc-desc">Para períodos inferiores a um mês (admissão, exoneração ou mudança de jornada
+          no meio do mês). Fórmula: <b>(Jornada ÷ 30) × nº de dias</b>.</p>
+        <div class="grid">
+          <label class="field">
+            <span>Jornada mensal (horas)</span>
+            <input type="number" id="calc-jornada" min="0" step="1" placeholder="Ex.: 200" />
+          </label>
+          <label class="field">
+            <span>Nº de dias no período (1 a 30)</span>
+            <input type="number" id="calc-dias" min="1" max="30" step="1" placeholder="Ex.: 25" />
+          </label>
+        </div>
+        <div class="calc-actions">
+          <button type="button" id="btn-calcular" class="btn btn--calc">Calcular</button>
+          <div id="calc-resultado" class="calc-result" aria-live="polite"></div>
+        </div>
+      </div>
+
       <div id="tabela-entrada" class="entry-table-wrap"></div>
     </section>
 

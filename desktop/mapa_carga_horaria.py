@@ -62,6 +62,8 @@ class MapaApp(ttk.Frame):
         self.var_periodo = IntVar(value=60)
         self.var_mesfinal = StringVar(value=mes_final_padrao())
         self.var_fill = StringVar()
+        self.var_calc_jornada = StringVar(value="150")
+        self.var_calc_dias = StringVar()
 
         self._construir()
         self._montar_tabela()
@@ -211,6 +213,27 @@ class MapaApp(ttk.Frame):
         ttk.Button(fillwrap, text="Aplicar a todos", command=self.preencher_todos).pack(side="left")
         r += 1
 
+        self._secao(f, "🧮 Calculadora — carga horária quebrada no mês")
+        r += 1
+        ttk.Label(f, text="Período inferior a um mês (admissão/exoneração/mudança de jornada). "
+                          "Fórmula: (Jornada ÷ 30) × nº de dias.",
+                  font=("Segoe UI", 8), foreground="#5b6675", wraplength=520, justify="left").grid(
+            row=r, column=0, columnspan=4, sticky="w", padx=4)
+        r += 1
+        calcwrap = ttk.Frame(f)
+        calcwrap.grid(row=r, column=0, columnspan=4, sticky=(E, W), padx=4, pady=(4, 2))
+        ttk.Label(calcwrap, text="Jornada mensal:", font=("Segoe UI", 8)).pack(side="left")
+        ttk.Entry(calcwrap, textvariable=self.var_calc_jornada, width=7).pack(side="left", padx=(4, 12))
+        ttk.Label(calcwrap, text="Nº de dias (1–30):", font=("Segoe UI", 8)).pack(side="left")
+        ent_dias = ttk.Entry(calcwrap, textvariable=self.var_calc_dias, width=6)
+        ent_dias.pack(side="left", padx=(4, 12))
+        ent_dias.bind("<Return>", lambda e: self._calcular_quebrada())
+        ttk.Button(calcwrap, text="Calcular", command=self._calcular_quebrada).pack(side="left")
+        r += 1
+        self.lbl_calc = ttk.Label(f, text="", font=("Segoe UI", 10, "bold"), foreground="#2f7d5b")
+        self.lbl_calc.grid(row=r, column=0, columnspan=4, sticky="w", padx=4, pady=(2, 4))
+        r += 1
+
         ttk.Label(f, text="Carga horária mensal (campo 7):", font=("Segoe UI", 9, "bold")).grid(
             row=r, column=0, columnspan=4, sticky="w", pady=(4, 2))
         r += 1
@@ -308,6 +331,24 @@ class MapaApp(ttk.Frame):
         except (ValueError, AttributeError):
             return []
         return periodo_meses(ano, mes, self.var_periodo.get())
+
+    def _calcular_quebrada(self):
+        """Calcula a carga horária de período inferior a um mês: (jornada / 30) * dias."""
+        try:
+            j = float(self.var_calc_jornada.get().strip().replace(",", "."))
+            d = int(float(self.var_calc_dias.get().strip().replace(",", ".")))
+        except (ValueError, AttributeError):
+            self.lbl_calc.configure(text="Informe a jornada e o nº de dias.", foreground="#8a5a00")
+            return
+        if j <= 0 or d <= 0:
+            self.lbl_calc.configure(text="Informe a jornada e o nº de dias.", foreground="#8a5a00")
+            return
+        if d > 30:
+            d = 30
+        exato = (j / 30) * d
+        horas = round(exato)
+        self.lbl_calc.configure(
+            text=f"= {horas} horas   ({j:g} ÷ 30 × {d} = {exato:.2f})", foreground="#2f7d5b")
 
     def _on_jornada(self):
         txt = self.cbo_jornada.get()

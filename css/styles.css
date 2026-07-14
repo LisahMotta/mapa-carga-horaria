@@ -139,6 +139,24 @@ fieldset.field legend { padding: 0 6px; }
 }
 .hint em { font-style: normal; font-weight: 700; }
 
+/* ---------- Calculadora ---------- */
+.calc-card {
+  margin: 14px 0;
+  padding: 4px 14px 14px;
+  border: 1px solid #cfe0d6;
+  background: var(--accent-soft);
+  border-radius: 10px;
+}
+.calc-card .panel__title { border-bottom-color: #bcd6c7; }
+.calc-desc { font-size: .82rem; color: var(--muted); margin: 0 0 10px; }
+.calc-desc b { color: var(--accent); }
+.btn--calc { background: var(--accent); color: #fff; }
+.btn--calc:hover { background: #276848; }
+.calc-actions { display: flex; align-items: center; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+.calc-result { font-size: .9rem; color: var(--ink); }
+.calc-result .num { font-size: 1.5rem; font-weight: 800; color: var(--accent); vertical-align: -2px; }
+.calc-result small { color: var(--muted); }
+
 /* ---------- Entry table ---------- */
 .entry-table-wrap { overflow-x: auto; margin-top: 8px; }
 table.entry {
