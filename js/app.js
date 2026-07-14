@@ -384,6 +384,30 @@ function bindCalculadora() {
   [j1, d1, j2, d2].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); }));
 }
 
+/* ---------- Calculadora: Jornada + Carga Suplementar (por mês) ---------- */
+function bindCalculadoraSuplementar() {
+  const bJ = $('#calc2-jornada'), bA = $('#calc2-aulas'), out = $('#calc2-resultado');
+  bJ.value = state.jornada; // pré-preenche com a jornada selecionada
+
+  const calc = () => {
+    const j = Number(bJ.value) || 0;
+    const a = Number(bA.value) || 0;
+    if (j <= 0 && a <= 0) {
+      out.innerHTML = '<span style="color:#8a94a3">Informe a jornada e/ou o nº de aulas.</span>';
+      return;
+    }
+    const supl = a * 5;
+    const total = j + supl;
+    out.innerHTML =
+      `<div class="calc-line">Carga suplementar: <b>${supl}</b> h <small>( ${a} × 5 )</small></div>` +
+      `<div class="calc-total">Total do mês: <span class="num">${total}</span> horas ` +
+      `<small>&nbsp;( ${j} + ${supl} )</small></div>`;
+  };
+
+  $('#btn-calcular2').addEventListener('click', calc);
+  [bJ, bA].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); }));
+}
+
 function limpar() {
   if (!confirm('Limpar todos os dados do mapa?')) return;
   localStorage.removeItem(STORAGE_KEY);
@@ -435,6 +459,7 @@ function init() {
   }
   bindForm();
   bindCalculadora();
+  bindCalculadoraSuplementar();
   sincronizarForm();
   renderEntrada();
   renderMapa();

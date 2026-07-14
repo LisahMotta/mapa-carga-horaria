@@ -149,6 +149,26 @@
         <div id="calc-resultado" class="calc-result" aria-live="polite"></div>
       </div>
 
+      <div class="calc-card">
+        <h2 class="panel__title">➕ Calculadora — Jornada + Carga Suplementar (por mês)</h2>
+        <p class="calc-desc">Calcula o total mensal a lançar no campo 7. Carga Suplementar =
+          <b>nº de aulas × 5</b>; Total = <b>Jornada + Carga Suplementar</b>.</p>
+        <div class="grid">
+          <label class="field">
+            <span>Jornada mensal (horas)</span>
+            <input type="number" id="calc2-jornada" min="0" step="1" placeholder="Ex.: 150" />
+          </label>
+          <label class="field">
+            <span>Nº de aulas suplementares</span>
+            <input type="number" id="calc2-aulas" min="0" step="1" placeholder="Ex.: 6" />
+          </label>
+        </div>
+        <div class="calc-actions">
+          <button type="button" id="btn-calcular2" class="btn btn--calc">Calcular</button>
+        </div>
+        <div id="calc2-resultado" class="calc-result" aria-live="polite"></div>
+      </div>
+
       <div id="tabela-entrada" class="entry-table-wrap"></div>
     </section>
 

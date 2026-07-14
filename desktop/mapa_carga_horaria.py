@@ -66,6 +66,8 @@ class MapaApp(ttk.Frame):
         self.var_calc_dias = StringVar()
         self.var_calc_jornada2 = StringVar()
         self.var_calc_dias2 = StringVar()
+        self.var_sup_jornada = StringVar(value="150")
+        self.var_sup_aulas = StringVar()
 
         self._construir()
         self._montar_tabela()
@@ -245,6 +247,29 @@ class MapaApp(ttk.Frame):
         self.lbl_calc.grid(row=r, column=0, columnspan=4, sticky="w", padx=4, pady=(2, 4))
         r += 1
 
+        self._secao(f, "➕ Calculadora — Jornada + Carga Suplementar (por mês)")
+        r += 1
+        ttk.Label(f, text="Total mensal para o campo 7. Carga Suplementar = nº de aulas × 5; "
+                          "Total = Jornada + Carga Suplementar.",
+                  font=("Segoe UI", 8), foreground="#5b6675", wraplength=520, justify="left").grid(
+            row=r, column=0, columnspan=4, sticky="w", padx=4)
+        r += 1
+        supwrap = ttk.Frame(f)
+        supwrap.grid(row=r, column=0, columnspan=4, sticky=(E, W), padx=4, pady=(4, 2))
+        ttk.Label(supwrap, text="Jornada mensal:", font=("Segoe UI", 8)).grid(row=0, column=0, sticky="w")
+        ttk.Entry(supwrap, textvariable=self.var_sup_jornada, width=7).grid(row=0, column=1, padx=(4, 12))
+        ttk.Label(supwrap, text="Nº de aulas suplem.:", font=("Segoe UI", 8)).grid(row=0, column=2, sticky="w")
+        ent_aulas = ttk.Entry(supwrap, textvariable=self.var_sup_aulas, width=6)
+        ent_aulas.grid(row=0, column=3, padx=(4, 0))
+        ent_aulas.bind("<Return>", lambda e: self._calcular_suplementar())
+        ttk.Button(supwrap, text="Calcular", command=self._calcular_suplementar).grid(
+            row=0, column=4, padx=(14, 0))
+        r += 1
+        self.lbl_sup = ttk.Label(f, text="", font=("Segoe UI", 9, "bold"), foreground="#2f7d5b",
+                                 justify="left", wraplength=520)
+        self.lbl_sup.grid(row=r, column=0, columnspan=4, sticky="w", padx=4, pady=(2, 4))
+        r += 1
+
         ttk.Label(f, text="Carga horária mensal (campo 7):", font=("Segoe UI", 9, "bold")).grid(
             row=r, column=0, columnspan=4, sticky="w", pady=(4, 2))
         r += 1
@@ -380,6 +405,25 @@ class MapaApp(ttk.Frame):
             p = p1 or p2
             linhas.append(f"► {p['horas']} horas")
         self.lbl_calc.configure(text="\n".join(linhas), foreground="#2f7d5b")
+
+    def _calcular_suplementar(self):
+        """Total mensal = jornada + (nº de aulas × 5)."""
+        def num(s):
+            try:
+                return float((s or "").strip().replace(",", "."))
+            except (ValueError, AttributeError):
+                return 0.0
+        j = num(self.var_sup_jornada.get())
+        a = num(self.var_sup_aulas.get())
+        if j <= 0 and a <= 0:
+            self.lbl_sup.configure(text="Informe a jornada e/ou o nº de aulas.", foreground="#8a5a00")
+            return
+        supl = a * 5
+        total = j + supl
+        self.lbl_sup.configure(
+            text=f"Carga suplementar: {supl:g} h  ({a:g} × 5)\n"
+                 f"► Total do mês: {total:g} horas  ({j:g} + {supl:g})",
+            foreground="#2f7d5b")
 
     def _on_jornada(self):
         txt = self.cbo_jornada.get()
