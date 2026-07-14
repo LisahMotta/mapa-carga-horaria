@@ -74,7 +74,7 @@ js/app.js       # estado, cálculos e renderização do mapa
 
 - LC 836/97 — Art. 39 das Disposições Transitórias (DDTT)
 - PA SPPREV nº 756/2015 · Informação UCRH nº 246/2016
-- Homologação: **DVIF** — `dvif@educacao.sp.gov.br`
+- Homologação: **DVIF**
 
 > Ferramenta de apoio ao preenchimento. Os dados devem sempre ser conferidos na **SED/GDAE** antes
 > do envio para homologação.

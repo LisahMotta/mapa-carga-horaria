@@ -96,4 +96,4 @@ requirements.txt       # dependência de build (pyinstaller)
 ## Base legal / referências
 
 LC 836/97 (Art. 39 das DDTT) · PA SPPREV nº 756/2015 · Informação UCRH nº 246/2016.
-Homologação: **DVIF** — `dvif@educacao.sp.gov.br`. Sempre conferir os dados na **SED/GDAE**.
+Homologação: **DVIF**. Sempre conferir os dados na **SED/GDAE**.
