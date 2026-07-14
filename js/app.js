@@ -339,26 +339,49 @@ function bindForm() {
 
 /* ---------- Calculadora: carga horária quebrada no mês ---------- */
 function bindCalculadora() {
-  const bJ = $('#calc-jornada'), bD = $('#calc-dias'), out = $('#calc-resultado');
-  bJ.value = state.jornada; // pré-preenche com a jornada selecionada
+  const j1 = $('#calc-jornada1'), d1 = $('#calc-dias1');
+  const j2 = $('#calc-jornada2'), d2 = $('#calc-dias2');
+  const out = $('#calc-resultado');
+  j1.value = state.jornada; // pré-preenche com a jornada selecionada
 
-  const calc = () => {
-    const j = Number(bJ.value) || 0;
-    let d = Math.floor(Number(bD.value) || 0);
-    if (j <= 0 || d <= 0) {
-      out.innerHTML = '<span style="color:#8a94a3">Informe a jornada e o nº de dias.</span>';
-      return;
-    }
+  // Calcula um período: (jornada / 30) * dias. Retorna null se inválido/vazio.
+  const parcial = (jVal, dVal) => {
+    const j = Number(jVal) || 0;
+    let d = Math.floor(Number(dVal) || 0);
+    if (j <= 0 || d <= 0) return null;
     if (d > 30) d = 30;
     const exato = (j / 30) * d;
-    const horas = Math.round(exato);
-    out.innerHTML = `<span class="num">${horas}</span> horas ` +
-      `<small>&nbsp;( ${j} ÷ 30 × ${d} = ${exato.toFixed(2)} )</small>`;
+    return { j, d, exato, horas: Math.round(exato) };
+  };
+
+  const linha = (n, p) =>
+    `<div class="calc-line">Período ${n}: <b>${p.horas}</b> h ` +
+    `<small>( ${p.j} ÷ 30 × ${p.d} = ${p.exato.toFixed(2)} )</small></div>`;
+
+  const calc = () => {
+    const p1 = parcial(j1.value, d1.value);
+    const p2 = parcial(j2.value, d2.value);
+    if (!p1 && !p2) {
+      out.innerHTML = '<span style="color:#8a94a3">Informe ao menos um período (jornada e nº de dias).</span>';
+      return;
+    }
+    let html = '';
+    if (p1) html += linha(1, p1);
+    if (p2) html += linha(2, p2);
+    if (p1 && p2) {
+      const totalExato = p1.exato + p2.exato;
+      const total = Math.round(totalExato);
+      html += `<div class="calc-total">Total: <span class="num">${total}</span> horas ` +
+        `<small>&nbsp;( ${p1.exato.toFixed(2)} + ${p2.exato.toFixed(2)} = ${totalExato.toFixed(2)} )</small></div>`;
+    } else {
+      const p = p1 || p2;
+      html += `<div class="calc-total"><span class="num">${p.horas}</span> horas</div>`;
+    }
+    out.innerHTML = html;
   };
 
   $('#btn-calcular').addEventListener('click', calc);
-  bD.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); });
-  bJ.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); });
+  [j1, d1, j2, d2].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') calc(); }));
 }
 
 function limpar() {

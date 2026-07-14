@@ -64,6 +64,8 @@ class MapaApp(ttk.Frame):
         self.var_fill = StringVar()
         self.var_calc_jornada = StringVar(value="150")
         self.var_calc_dias = StringVar()
+        self.var_calc_jornada2 = StringVar()
+        self.var_calc_dias2 = StringVar()
 
         self._construir()
         self._montar_tabela()
@@ -216,21 +218,29 @@ class MapaApp(ttk.Frame):
         self._secao(f, "🧮 Calculadora — carga horária quebrada no mês")
         r += 1
         ttk.Label(f, text="Período inferior a um mês (admissão/exoneração/mudança de jornada). "
-                          "Fórmula: (Jornada ÷ 30) × nº de dias.",
+                          "Fórmula: (Jornada ÷ 30) × nº de dias. Preencha o Período 2 para somar dois períodos.",
                   font=("Segoe UI", 8), foreground="#5b6675", wraplength=520, justify="left").grid(
             row=r, column=0, columnspan=4, sticky="w", padx=4)
         r += 1
         calcwrap = ttk.Frame(f)
         calcwrap.grid(row=r, column=0, columnspan=4, sticky=(E, W), padx=4, pady=(4, 2))
-        ttk.Label(calcwrap, text="Jornada mensal:", font=("Segoe UI", 8)).pack(side="left")
-        ttk.Entry(calcwrap, textvariable=self.var_calc_jornada, width=7).pack(side="left", padx=(4, 12))
-        ttk.Label(calcwrap, text="Nº de dias (1–30):", font=("Segoe UI", 8)).pack(side="left")
+        ttk.Label(calcwrap, text="Período 1 — Jornada:", font=("Segoe UI", 8)).grid(row=0, column=0, sticky="w")
+        ttk.Entry(calcwrap, textvariable=self.var_calc_jornada, width=7).grid(row=0, column=1, padx=(4, 12))
+        ttk.Label(calcwrap, text="Nº dias (1–30):", font=("Segoe UI", 8)).grid(row=0, column=2, sticky="w")
         ent_dias = ttk.Entry(calcwrap, textvariable=self.var_calc_dias, width=6)
-        ent_dias.pack(side="left", padx=(4, 12))
+        ent_dias.grid(row=0, column=3, padx=(4, 0))
         ent_dias.bind("<Return>", lambda e: self._calcular_quebrada())
-        ttk.Button(calcwrap, text="Calcular", command=self._calcular_quebrada).pack(side="left")
+        ttk.Label(calcwrap, text="Período 2 — Jornada:", font=("Segoe UI", 8)).grid(row=1, column=0, sticky="w", pady=(4, 0))
+        ttk.Entry(calcwrap, textvariable=self.var_calc_jornada2, width=7).grid(row=1, column=1, padx=(4, 12), pady=(4, 0))
+        ttk.Label(calcwrap, text="Nº dias (opc.):", font=("Segoe UI", 8)).grid(row=1, column=2, sticky="w", pady=(4, 0))
+        ent_dias2 = ttk.Entry(calcwrap, textvariable=self.var_calc_dias2, width=6)
+        ent_dias2.grid(row=1, column=3, padx=(4, 0), pady=(4, 0))
+        ent_dias2.bind("<Return>", lambda e: self._calcular_quebrada())
+        ttk.Button(calcwrap, text="Calcular", command=self._calcular_quebrada).grid(
+            row=0, column=4, rowspan=2, padx=(14, 0))
         r += 1
-        self.lbl_calc = ttk.Label(f, text="", font=("Segoe UI", 10, "bold"), foreground="#2f7d5b")
+        self.lbl_calc = ttk.Label(f, text="", font=("Segoe UI", 9, "bold"), foreground="#2f7d5b",
+                                  justify="left", wraplength=520)
         self.lbl_calc.grid(row=r, column=0, columnspan=4, sticky="w", padx=4, pady=(2, 4))
         r += 1
 
@@ -332,23 +342,43 @@ class MapaApp(ttk.Frame):
             return []
         return periodo_meses(ano, mes, self.var_periodo.get())
 
-    def _calcular_quebrada(self):
-        """Calcula a carga horária de período inferior a um mês: (jornada / 30) * dias."""
+    @staticmethod
+    def _parcial_quebrada(jornada_str, dias_str):
+        """Calcula (jornada / 30) * dias para um período. Retorna None se inválido/vazio."""
         try:
-            j = float(self.var_calc_jornada.get().strip().replace(",", "."))
-            d = int(float(self.var_calc_dias.get().strip().replace(",", ".")))
+            j = float((jornada_str or "").strip().replace(",", "."))
+            d = int(float((dias_str or "").strip().replace(",", ".")))
         except (ValueError, AttributeError):
-            self.lbl_calc.configure(text="Informe a jornada e o nº de dias.", foreground="#8a5a00")
-            return
+            return None
         if j <= 0 or d <= 0:
-            self.lbl_calc.configure(text="Informe a jornada e o nº de dias.", foreground="#8a5a00")
-            return
+            return None
         if d > 30:
             d = 30
         exato = (j / 30) * d
-        horas = round(exato)
-        self.lbl_calc.configure(
-            text=f"= {horas} horas   ({j:g} ÷ 30 × {d} = {exato:.2f})", foreground="#2f7d5b")
+        return {"j": j, "d": d, "exato": exato, "horas": round(exato)}
+
+    def _calcular_quebrada(self):
+        """Calcula a carga horária quebrada de um ou dois períodos e a soma."""
+        p1 = self._parcial_quebrada(self.var_calc_jornada.get(), self.var_calc_dias.get())
+        p2 = self._parcial_quebrada(self.var_calc_jornada2.get(), self.var_calc_dias2.get())
+        if not p1 and not p2:
+            self.lbl_calc.configure(
+                text="Informe ao menos um período (jornada e nº de dias).", foreground="#8a5a00")
+            return
+
+        linhas = []
+        if p1:
+            linhas.append(f"Período 1: {p1['horas']} h   ({p1['j']:g} ÷ 30 × {p1['d']} = {p1['exato']:.2f})")
+        if p2:
+            linhas.append(f"Período 2: {p2['horas']} h   ({p2['j']:g} ÷ 30 × {p2['d']} = {p2['exato']:.2f})")
+        if p1 and p2:
+            total_exato = p1["exato"] + p2["exato"]
+            linhas.append(f"► Total: {round(total_exato)} horas   "
+                          f"({p1['exato']:.2f} + {p2['exato']:.2f} = {total_exato:.2f})")
+        else:
+            p = p1 or p2
+            linhas.append(f"► {p['horas']} horas")
+        self.lbl_calc.configure(text="\n".join(linhas), foreground="#2f7d5b")
 
     def _on_jornada(self):
         txt = self.cbo_jornada.get()

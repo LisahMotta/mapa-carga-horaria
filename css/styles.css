@@ -153,9 +153,13 @@ fieldset.field legend { padding: 0 6px; }
 .btn--calc { background: var(--accent); color: #fff; }
 .btn--calc:hover { background: #276848; }
 .calc-actions { display: flex; align-items: center; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
-.calc-result { font-size: .9rem; color: var(--ink); }
+.calc-result { font-size: .9rem; color: var(--ink); margin-top: 10px; }
+.calc-result:empty { margin-top: 0; }
 .calc-result .num { font-size: 1.5rem; font-weight: 800; color: var(--accent); vertical-align: -2px; }
 .calc-result small { color: var(--muted); }
+.calc-line { padding: 2px 0; }
+.calc-line b { color: var(--brand-ink); }
+.calc-total { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #bcd6c7; font-weight: 600; }
 
 /* ---------- Entry table ---------- */
 .entry-table-wrap { overflow-x: auto; margin-top: 8px; }

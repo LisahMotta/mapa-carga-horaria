@@ -123,21 +123,30 @@
       <div class="calc-card">
         <h2 class="panel__title">🧮 Calculadora — carga horária quebrada no mês</h2>
         <p class="calc-desc">Para períodos inferiores a um mês (admissão, exoneração ou mudança de jornada
-          no meio do mês). Fórmula: <b>(Jornada ÷ 30) × nº de dias</b>.</p>
+          no meio do mês). Fórmula: <b>(Jornada ÷ 30) × nº de dias</b>. Preencha o Período 2 para
+          <b>somar dois períodos</b> (ex.: mudança de jornada no meio do mês).</p>
         <div class="grid">
           <label class="field">
-            <span>Jornada mensal (horas)</span>
-            <input type="number" id="calc-jornada" min="0" step="1" placeholder="Ex.: 200" />
+            <span>Período 1 — Jornada mensal</span>
+            <input type="number" id="calc-jornada1" min="0" step="1" placeholder="Ex.: 200" />
           </label>
           <label class="field">
-            <span>Nº de dias no período (1 a 30)</span>
-            <input type="number" id="calc-dias" min="1" max="30" step="1" placeholder="Ex.: 25" />
+            <span>Período 1 — Nº de dias (1 a 30)</span>
+            <input type="number" id="calc-dias1" min="1" max="30" step="1" placeholder="Ex.: 25" />
+          </label>
+          <label class="field">
+            <span>Período 2 — Jornada mensal <small>(opcional)</small></span>
+            <input type="number" id="calc-jornada2" min="0" step="1" placeholder="Ex.: 150" />
+          </label>
+          <label class="field">
+            <span>Período 2 — Nº de dias <small>(opcional)</small></span>
+            <input type="number" id="calc-dias2" min="1" max="30" step="1" placeholder="Ex.: 5" />
           </label>
         </div>
         <div class="calc-actions">
           <button type="button" id="btn-calcular" class="btn btn--calc">Calcular</button>
-          <div id="calc-resultado" class="calc-result" aria-live="polite"></div>
         </div>
+        <div id="calc-resultado" class="calc-result" aria-live="polite"></div>
       </div>
 
       <div id="tabela-entrada" class="entry-table-wrap"></div>
