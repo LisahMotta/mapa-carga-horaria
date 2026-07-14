@@ -11,11 +11,12 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import tempfile
 import webbrowser
 from datetime import date
 from tkinter import (
-    Tk, StringVar, IntVar, Text, filedialog, messagebox, ttk, Canvas, Frame,
+    Tk, StringVar, IntVar, Text, PhotoImage, filedialog, messagebox, ttk, Canvas, Frame,
     N, S, E, W, END,
 )
 
@@ -24,6 +25,36 @@ from calculo import (
 )
 
 APP_TITULO = "Mapa de Carga Horária — Cálculo de Proventos"
+
+# Ícone da janela (calculadora) — PNG 64x64 em base64, para não depender de arquivo externo.
+_ICONE_PNG_B64 = (
+    "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABkElEQVR4nO2bMU4DMRREfxANHdU2kTgATYrc"
+    "gTYH4AwcgCYFDQfgDBwgLXdIkSYHQEqTii7lUiBLK8T+Ha+THWzPa+OJ5s/aK3+tvpkQVTOLWdwsV+2ljJyb"
+    "43YD1XaNLAqF38zvUzxNSmPWmg0HMZhSs1y1ORX+m9Nh74Zw5YlzL97sZ9d6R9cNoAZ6Ayjh6Qe8XQC9BAMfb"
+    "8/ncTQBD0+v0Dr4CORUvBnuV+8AtgE2CoBtgI0CYBtgowDYBtjAAaA3q/8C6jfqKpxbCAjVH4GoHbB7X0f9+eLx"
+    "ZbQ2Vd/VesA7YEwBQTNGm6pHNdUfAQXANsBGAbANsFEAbANsFAC6EL1Z/aUZo03Vo5reb2YlfRgx6/9GqF4A/UP1"
+    "AoWiANgG2CgAtgE2CoBtgI0CQBeqF8ic7HuB28VnlPZrdwety6IXiC0+RqOXINsAGwXANsBGAbANsFEAbANssugF"
+    "0FtdF1TjzgyV0g94c0M6At6Px+1mdjrsp/JyEYamxqDhwhznBsODS54b7FLi5KionW9de53j6Tbv1AAAAABJRU5E"
+    "rkJggg=="
+)
+
+
+def aplicar_icone(root: Tk) -> None:
+    """Define o ícone de calculadora na janela (multiplataforma)."""
+    try:
+        img = PhotoImage(data=_ICONE_PNG_B64)
+        root.iconphoto(True, img)
+        root._icone_ref = img  # mantém referência para não ser coletado
+    except Exception:
+        pass
+    # No Windows, usa também o .ico (barra de tarefas) quando disponível.
+    try:
+        base = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+        ico = os.path.join(base, "icon.ico")
+        if os.path.exists(ico):
+            root.iconbitmap(ico)
+    except Exception:
+        pass
 
 
 def mes_final_padrao() -> str:
@@ -749,6 +780,7 @@ def main():
     root.title(APP_TITULO)
     root.geometry("1100x740")
     root.minsize(920, 600)
+    aplicar_icone(root)
     try:
         ttk.Style().theme_use("clam")
     except Exception:
