@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)</title>
+  <meta name="description" content="Gerador do Mapa de Carga Horária de professor (ANEXO III - SEDUC/CGRH/CEVIF) para cálculo de proventos de aposentadoria." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="app-header no-print">
+    <div class="app-header__inner">
+      <div>
+        <h1>Mapa de Carga Horária</h1>
+        <p class="app-header__sub">Quadro da carga horária para cálculo de proventos — ANEXO III · SEDUC / CGRH / CEVIF</p>
+      </div>
+      <div class="app-header__actions">
+        <button type="button" id="btn-exemplo" class="btn btn--ghost">Carregar exemplo</button>
+        <button type="button" id="btn-limpar" class="btn btn--ghost">Limpar</button>
+        <button type="button" id="btn-imprimir" class="btn btn--primary">Imprimir / PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ======================= FORM / ENTRADA ======================= -->
+    <section class="panel no-print" aria-label="Dados do docente">
+      <h2 class="panel__title">1 · Identificação do docente</h2>
+      <div class="grid">
+        <label class="field field--wide">
+          <span>Nome completo <b>(campo 1)</b></span>
+          <input type="text" id="nome" placeholder="Nome do(a) docente" />
+        </label>
+        <label class="field">
+          <span>RG <b>(campo 2)</b></span>
+          <input type="text" id="rg" placeholder="00.000.000-0" />
+        </label>
+        <label class="field">
+          <span>CPF <b>(campo 2)</b></span>
+          <input type="text" id="cpf" placeholder="000.000.000-00" />
+        </label>
+        <label class="field">
+          <span>Cargo / Função-Atividade <b>(campo 3)</b></span>
+          <input type="text" id="cargo" value="PEB" placeholder="Ex.: PEB" />
+        </label>
+        <label class="field">
+          <span>Faixa / Nível <b>(campo 4)</b></span>
+          <input type="text" id="faixa" placeholder="Faixa / Nível" />
+        </label>
+        <label class="field">
+          <span>DI <b>(campo 4)</b></span>
+          <input type="text" id="di" placeholder="DI" />
+        </label>
+      </div>
+
+      <h2 class="panel__title">5 · Vínculo e jornada</h2>
+      <div class="grid">
+        <fieldset class="field field--wide">
+          <legend>Tipo de vínculo <b>(campo 5)</b></legend>
+          <div class="radios">
+            <label><input type="radio" name="vinculo" value="titular" checked /> Titular de Cargo</label>
+            <label><input type="radio" name="vinculo" value="ofa" /> Ocupante de Função-Atividade (OFA)</label>
+          </div>
+        </fieldset>
+
+        <label class="field">
+          <span>Jornada atual <b>(campo 6)</b></span>
+          <select id="jornada">
+            <option value="96">Jornada Reduzida — 96 horas</option>
+            <option value="120">Jornada Inicial — 120 horas</option>
+            <option value="150" selected>Jornada Básica — 150 horas</option>
+            <option value="200">Jornada Completa — 200 horas</option>
+          </select>
+        </label>
+
+        <label class="field" id="wrap-jornada-desde">
+          <span>Incluído na jornada a partir de <b>(campo 6)</b></span>
+          <input type="date" id="jornada-desde" />
+        </label>
+        <label class="field" id="wrap-doe">
+          <span>Publicação DOE <b>(campo 6)</b></span>
+          <input type="date" id="doe" />
+        </label>
+      </div>
+
+      <h2 class="panel__title">7 · Período de opção e carga horária</h2>
+      <div class="grid">
+        <label class="field">
+          <span>Período de opção <b>(campo 9)</b></span>
+          <select id="periodo">
+            <option value="60">60 meses (últimos 60 meses)</option>
+            <option value="84">84 meses ininterruptos</option>
+            <option value="120">120 meses intercalados</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Mês/ano do último mês do período</span>
+          <input type="month" id="mes-final" />
+        </label>
+        <label class="field">
+          <span>Preenchimento rápido (horas/mês)</span>
+          <div class="inline">
+            <input type="number" id="fill-valor" min="0" step="1" placeholder="Ex.: 150" />
+            <button type="button" id="btn-fill" class="btn btn--ghost">Aplicar a todos</button>
+          </div>
+        </label>
+      </div>
+
+      <div class="hint">
+        <strong>Como preencher:</strong> informe mês a mês o somatório da <em>Jornada + Carga Suplementar</em>
+        constante da SED. Para períodos anteriores a 01/02/1998 aplique a equivalência entre horas e
+        horas-aula (Anexo I), exceto em regime de 40 horas.
+      </div>
+
+      <div id="tabela-entrada" class="entry-table-wrap"></div>
+    </section>
+
+    <!-- ======================= SAÍDA / MAPA ======================= -->
+    <section class="panel panel--output" aria-label="Mapa gerado">
+      <div id="mapa" class="mapa">
+        <!-- preenchido via JS -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer no-print">
+    <p>Base legal: LC 836/97 (Art. 39 das DDTT) · PA SPPREV nº 756/2015 · Informação UCRH nº 246/2016.
+       Documento de apoio — sempre confira os dados na SED/GDAE. Homologação: CEVIF —
+       <a href="mailto:cevif@educacao.sp.gov.br">cevif@educacao.sp.gov.br</a>.</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
