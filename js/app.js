@@ -26,6 +26,7 @@ const state = {
   vinculo: 'titular',
   jornada: 150,
   jornadaDesde: '', doe: '',
+  nomeacao: '',
   periodo: 60,
   mesFinal: '',
   ch: {}
@@ -243,6 +244,9 @@ function renderMapa() {
     <div class="mapa__row"><div class="mapa__badge">7 · Carga horária — período de opção: ${r.nMeses} meses</div></div>
     <div class="mapa__row"><div class="mapa__cell" style="border-right:none">${chTable}</div></div>
 
+    <div class="mapa__row"><div class="mapa__badge">8 · Nomeação/Designação em regime de 40 horas/semanais</div></div>
+    <div class="mapa__row"><div class="mapa__cell" style="border-right:none;white-space:pre-wrap">${esc(state.nomeacao).trim() || '<span style="color:#8a94a3">Não há.</span>'}</div></div>
+
     <div class="mapa__row"><div class="mapa__badge">10 · Média da carga horária (7.A ÷ ${r.nMeses} meses, arredondada ao inteiro)</div></div>
     <div class="mapa__row"><div class="mapa__cell" style="border-right:none;padding:0">${resultado}</div></div>
 
@@ -281,7 +285,8 @@ function carregar() {
 function bindForm() {
   const map = {
     '#nome': 'nome', '#rg': 'rg', '#cpf': 'cpf', '#cargo': 'cargo',
-    '#faixa': 'faixa', '#di': 'di', '#jornada-desde': 'jornadaDesde', '#doe': 'doe'
+    '#faixa': 'faixa', '#di': 'di', '#jornada-desde': 'jornadaDesde', '#doe': 'doe',
+    '#nomeacao': 'nomeacao'
   };
   Object.entries(map).forEach(([sel, prop]) => {
     const el = $(sel);
@@ -331,7 +336,7 @@ function limpar() {
   localStorage.removeItem(STORAGE_KEY);
   Object.assign(state, {
     nome: '', rg: '', cpf: '', cargo: 'PEB', faixa: '', di: '',
-    vinculo: 'titular', jornada: 150, jornadaDesde: '', doe: '',
+    vinculo: 'titular', jornada: 150, jornadaDesde: '', doe: '', nomeacao: '',
     periodo: 60, mesFinal: defaultMesFinal(), ch: {}
   });
   sincronizarForm();
@@ -345,6 +350,7 @@ function carregarExemplo() {
     cargo: 'PEB II', faixa: 'Faixa 5 / Nível I', di: '001',
     vinculo: 'titular', jornada: 150,
     jornadaDesde: '2015-02-01', doe: '2015-02-05',
+    nomeacao: 'Vice-Diretor de Escola, de 01/02/2016 a 31/12/2018 (DOE 05/02/2016).',
     periodo: 60, mesFinal: defaultMesFinal(), ch: {}
   });
   // preenche 60 meses variando entre 150 e 180 horas
@@ -360,6 +366,7 @@ function sincronizarForm() {
   $('#nome').value = state.nome; $('#rg').value = state.rg; $('#cpf').value = state.cpf;
   $('#cargo').value = state.cargo; $('#faixa').value = state.faixa; $('#di').value = state.di;
   $('#jornada-desde').value = state.jornadaDesde; $('#doe').value = state.doe;
+  $('#nomeacao').value = state.nomeacao || '';
   $('#jornada').value = String(state.jornada);
   $('#periodo').value = String(state.periodo);
   $('#mes-final').value = state.mesFinal;

@@ -105,7 +105,7 @@ body {
 .field--wide { grid-column: 1 / -1; }
 .field > span, .field legend { font-weight: 600; }
 .field b { color: var(--brand); font-weight: 700; }
-.field input, .field select {
+.field input, .field select, .field textarea {
   font: inherit;
   font-size: .9rem;
   color: var(--ink);
@@ -115,7 +115,8 @@ body {
   background: #fff;
   width: 100%;
 }
-.field input:focus, .field select:focus {
+.field textarea { resize: vertical; min-height: 56px; }
+.field input:focus, .field select:focus, .field textarea:focus {
   outline: none;
   border-color: var(--brand);
   box-shadow: 0 0 0 3px rgba(31, 78, 121, .12);

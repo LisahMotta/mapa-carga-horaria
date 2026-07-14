@@ -15,7 +15,7 @@ import tempfile
 import webbrowser
 from datetime import date
 from tkinter import (
-    Tk, StringVar, IntVar, filedialog, messagebox, ttk, Canvas, Frame,
+    Tk, StringVar, IntVar, Text, filedialog, messagebox, ttk, Canvas, Frame,
     N, S, E, W, END,
 )
 
@@ -178,6 +178,17 @@ class MapaApp(ttk.Frame):
         r += 1
         campo("Incluído a partir de (6) — AAAA-MM-DD", self.var_desde, 0, span=2)
         campo("Publicação DOE (6) — AAAA-MM-DD", self.var_doe, 2, span=2)
+        r += 1
+
+        self._secao(f, "8 · Nomeação/Designação em regime de 40 horas/semanais")
+        r += 1
+        ttk.Label(f, text="Diretor, Vice-Diretor, Coordenador (períodos e DOE):",
+                  font=("Segoe UI", 8)).grid(row=r, column=0, columnspan=4, sticky="w", padx=4)
+        r += 1
+        self.txt_nomeacao = Text(f, height=3, wrap="word", font=("Segoe UI", 9),
+                                 relief="solid", borderwidth=1)
+        self.txt_nomeacao.grid(row=r, column=0, columnspan=4, sticky=(E, W), padx=4, pady=(2, 4))
+        self.txt_nomeacao.bind("<KeyRelease>", lambda e: self._atualizar_resultado())
         r += 1
 
         self._secao(f, "7–9 · Período de opção e carga horária")
@@ -381,6 +392,7 @@ class MapaApp(ttk.Frame):
             (self.var_desde, ""), (self.var_doe, ""), (self.var_fill, ""),
         ]:
             var.set(dflt)
+        self._set_nomeacao("")
         self.var_vinculo.set("titular")
         self.var_jornada.set(150)
         self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
@@ -389,12 +401,21 @@ class MapaApp(ttk.Frame):
         self.var_mesfinal.set(mes_final_padrao())
         self._montar_tabela()
 
+    def _get_nomeacao(self) -> str:
+        return self.txt_nomeacao.get("1.0", END).strip()
+
+    def _set_nomeacao(self, texto: str):
+        self.txt_nomeacao.delete("1.0", END)
+        if texto:
+            self.txt_nomeacao.insert("1.0", texto)
+
     def _coletar_estado(self) -> dict:
         return {
             "nome": self.var_nome.get(), "rg": self.var_rg.get(), "cpf": self.var_cpf.get(),
             "cargo": self.var_cargo.get(), "faixa": self.var_faixa.get(), "di": self.var_di.get(),
             "vinculo": self.var_vinculo.get(), "jornada": self.var_jornada.get(),
             "desde": self.var_desde.get(), "doe": self.var_doe.get(),
+            "nomeacao": self._get_nomeacao(),
             "periodo": self.var_periodo.get(), "mes_final": self.var_mesfinal.get(),
             "ch": self.ch,
         }
@@ -411,6 +432,7 @@ class MapaApp(ttk.Frame):
         self.cbo_jornada.set(f"{JORNADAS.get(self.var_jornada.get(), 'Jornada Básica')} — {self.var_jornada.get()} horas")
         self.var_desde.set(d.get("desde", ""))
         self.var_doe.set(d.get("doe", ""))
+        self._set_nomeacao(d.get("nomeacao", ""))
         self.var_periodo.set(int(d.get("periodo", 60)))
         self.cbo_periodo.set(PERIODOS.get(self.var_periodo.get(), PERIODOS[60]))
         self.var_mesfinal.set(d.get("mes_final", mes_final_padrao()))
@@ -452,6 +474,7 @@ class MapaApp(ttk.Frame):
         self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
         self.var_desde.set("2015-02-01")
         self.var_doe.set("2015-02-05")
+        self._set_nomeacao("Vice-Diretor de Escola, de 01/02/2016 a 31/12/2018 (DOE 05/02/2016).")
         self.var_periodo.set(60)
         self.cbo_periodo.set(PERIODOS[60])
         self.var_mesfinal.set(mes_final_padrao())
@@ -479,6 +502,7 @@ class MapaApp(ttk.Frame):
         ativos = {chave(a, m) for a, m in meses}
         vinc = "Titular de Cargo" if self.var_vinculo.get() == "titular" else "Ocupante de Função-Atividade (OFA)"
         jn = JORNADAS.get(self.var_jornada.get(), "")
+        nomeacao = escape(self._get_nomeacao()) or "<span style='color:#8a94a3'>Não há.</span>"
 
         linhas = ""
         for i in range(12):
@@ -540,6 +564,8 @@ tfoot td{{background:#e6f2ec;font-weight:700;}}
 <table><thead><tr><th>Mês</th>{col_anos}</tr></thead><tbody>{linhas}
 <tr><td class='l'>Totais anuais</td>{tot_cells}</tr></tbody>
 <tfoot><tr><td class='l'>7.A · Total geral</td><td colspan='{len(anos)}'>{res.total} horas</td></tr></tfoot></table></div></div>
+<div class='row'><div class='badge'>8 · Nomeação/Designação em regime de 40 horas/semanais</div></div>
+<div class='row'><div class='c' style='border-right:none;white-space:pre-wrap'>{nomeacao}</div></div>
 <div class='row'><div class='badge'>10 · Média (7.A ÷ {res.n_meses} meses, arredondada ao inteiro)</div></div>
 <div class='row'><div class='c' style='border-right:none;padding:0'>{quadro}</div></div>
 <div class='decl'><b>9 · Declaração:</b> Declaro que estou ciente do nº de aulas constante deste Quadro,
