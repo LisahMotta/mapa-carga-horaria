@@ -1,0 +1,3 @@
+# O aplicativo usa apenas a biblioteca padrão do Python (tkinter).
+# A única dependência é para GERAR o executável (dist/):
+pyinstaller>=6.0

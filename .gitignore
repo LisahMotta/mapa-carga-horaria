@@ -3,3 +3,12 @@ node_modules/
 .DS_Store
 .vscode/
 .idea/
+
+# Python / PyInstaller
+__pycache__/
+*.pyc
+desktop/build/
+desktop/dist/
+*.egg-info/
+.venv/
+venv/

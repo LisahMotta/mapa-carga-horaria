@@ -7,6 +7,13 @@ cálculo de proventos de aposentadoria.
 O app automatiza o preenchimento e os cálculos do formulário oficial descrito no manual de
 orientação, dispensando o preenchimento manual e reduzindo erros de conta.
 
+## Versões disponíveis
+
+- **Web** (esta pasta): abre no navegador, sem instalação — veja instruções abaixo.
+- **Desktop nativo para PC** (pasta [`desktop/`](desktop/)): aplicativo em Python/Tkinter que
+  pode ser distribuído como **executável único** (`.exe` no Windows) via PyInstaller.
+  Consulte [`desktop/README.md`](desktop/README.md).
+
 ## Funcionalidades
 
 - **Identificação do docente** (campos 1 a 6): nome, RG, CPF, cargo/função, faixa/nível, DI,
