@@ -1,7 +1,7 @@
 # Mapa de Carga Horária — App Desktop (Python / Tkinter)
 
 Aplicativo **nativo para PC** (Windows, Linux e macOS) que gera o **Mapa de Carga Horária**
-de docente para aposentadoria — ANEXO III · SEDUC / DIPES / CEVIF.
+de docente para aposentadoria — ANEXO III · SEDUC / DIPES / DVIF.
 
 Mesma lógica da versão web, porém rodando como programa de desktop, sem depender de navegador,
 e podendo ser distribuído como **executável único** (`.exe` no Windows).
@@ -96,4 +96,4 @@ requirements.txt       # dependência de build (pyinstaller)
 ## Base legal / referências
 
 LC 836/97 (Art. 39 das DDTT) · PA SPPREV nº 756/2015 · Informação UCRH nº 246/2016.
-Homologação: **CEVIF** — `cevif@educacao.sp.gov.br`. Sempre conferir os dados na **SED/GDAE**.
+Homologação: **DVIF** — `dvif@educacao.sp.gov.br`. Sempre conferir os dados na **SED/GDAE**.

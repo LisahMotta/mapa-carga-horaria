@@ -1,6 +1,6 @@
 /* ============================================================
    Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
-   ANEXO III — SEDUC / DIPES / CEVIF
+   ANEXO III — SEDUC / DIPES / DVIF
    Lógica de cálculo baseada na LC 836/97 (Art. 39 DDTT).
    ============================================================ */
 
@@ -261,7 +261,7 @@ function renderMapa() {
     </div>
     <div class="note-obs">
       Mapa de Carga Horária elaborado de acordo com o PA SPPREV nº 756/2015 e Informação UCRH nº 246/2016.
-      Verificar sempre a SED para evitar divergências. Homologação: CEVIF.
+      Verificar sempre a SED para evitar divergências. Homologação: DVIF.
     </div>
   `;
 

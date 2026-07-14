@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
-Aplicativo desktop nativo (Tkinter) — ANEXO III · SEDUC / DIPES / CEVIF.
+Aplicativo desktop nativo (Tkinter) — ANEXO III · SEDUC / DIPES / DVIF.
 
 Gera o Mapa de Carga Horária de docente para aposentadoria, com preenchimento
 mensal, cálculo automático da média e exportação para HTML (impressão/PDF).
@@ -81,7 +81,7 @@ class MapaApp(ttk.Frame):
             font=("Segoe UI", 15, "bold"),
         ).pack(side="left", padx=14, pady=(10, 0), anchor="w")
         ttk.Label(
-            head, text="ANEXO III · SEDUC / DIPES / CEVIF — cálculo de proventos",
+            head, text="ANEXO III · SEDUC / DIPES / DVIF — cálculo de proventos",
             background="#1f4e79", foreground="#d6e2ef", font=("Segoe UI", 9),
         ).pack(side="left", padx=8, pady=(14, 8))
 
@@ -549,7 +549,7 @@ tfoot td{{background:#e6f2ec;font-weight:700;}}
 @media print{{@page{{size:A4;margin:12mm;}}.badge{{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}}}
 </style></head><body>
 <div class='map'>
-<div class='hd'><h3>Mapa de Carga Horária</h3><small>ANEXO III · SEDUC / DIPES / CEVIF — cálculo de proventos</small></div>
+<div class='hd'><h3>Mapa de Carga Horária</h3><small>ANEXO III · SEDUC / DIPES / DVIF — cálculo de proventos</small></div>
 <div class='row r2'><div class='c'><small>1 · Nome</small>{escape(self.var_nome.get()) or '&nbsp;'}</div>
 <div class='c'><small>2 · RG / CPF</small>{escape(self.var_rg.get())} {escape(self.var_cpf.get())}</div></div>
 <div class='row r4'><div class='c'><small>3 · Cargo</small>{escape(self.var_cargo.get()) or '&nbsp;'}</div>
