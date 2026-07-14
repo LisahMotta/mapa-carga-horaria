@@ -1,7 +1,7 @@
 # Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
 
 Aplicativo web para **gerar o Mapa de Carga Horária** de docentes (professores) da rede
-estadual de ensino de São Paulo, conforme o **ANEXO III — SEDUC / CGRH / CEVIF**, usado no
+estadual de ensino de São Paulo, conforme o **ANEXO III — SEDUC / DIPES / CEVIF**, usado no
 cálculo de proventos de aposentadoria.
 
 O app automatiza o preenchimento e os cálculos do formulário oficial descrito no manual de

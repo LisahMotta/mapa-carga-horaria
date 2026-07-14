@@ -1,6 +1,6 @@
 /* ============================================================
    Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
-   ANEXO III — SEDUC / CGRH / CEVIF
+   ANEXO III — SEDUC / DIPES / CEVIF
    Lógica de cálculo baseada na LC 836/97 (Art. 39 DDTT).
    ============================================================ */
 
@@ -222,7 +222,7 @@ function renderMapa() {
   const html = `
     <div class="mapa__head">
       <h3>Mapa de Carga Horária</h3>
-      <small>Quadro da carga horária para cálculo de proventos — ANEXO III · SEDUC / CGRH / Diretoria de Ensino</small>
+      <small>Quadro da carga horária para cálculo de proventos — ANEXO III · SEDUC / DIPES / Unidade Regional de Ensino</small>
     </div>
 
     <div class="mapa__row r-2">

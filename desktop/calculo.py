@@ -1,6 +1,6 @@
 """
 Lógica de cálculo do Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria).
-ANEXO III — SEDUC / CGRH / CEVIF · Base: LC 836/97 (Art. 39 das DDTT).
+ANEXO III — SEDUC / DIPES / CEVIF · Base: LC 836/97 (Art. 39 das DDTT).
 
 Este módulo NÃO depende de interface gráfica, para permitir testes automatizados.
 """
