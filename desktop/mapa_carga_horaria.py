@@ -96,7 +96,8 @@ class MapaApp(ttk.Frame):
         ttk.Button(bar, text="Abrir…", command=self.abrir).pack(side="left", padx=2)
         ttk.Button(bar, text="Salvar…", command=self.salvar).pack(side="left", padx=2)
         ttk.Button(bar, text="Exemplo", command=self.carregar_exemplo).pack(side="left", padx=2)
-        ttk.Button(bar, text="Exportar / Imprimir (HTML/PDF)", command=self.exportar_html).pack(side="left", padx=8)
+        ttk.Button(bar, text="Exportar / Imprimir (HTML/PDF)", command=self.exportar_html).pack(side="left", padx=(8, 2))
+        ttk.Button(bar, text="Baixar Excel (.xlsx)", command=self.exportar_excel).pack(side="left", padx=2)
 
         # Corpo com duas colunas: formulário (scroll) + resultado
         corpo = ttk.Panedwindow(self, orient="horizontal")
@@ -566,6 +567,57 @@ class MapaApp(ttk.Frame):
         with os.fdopen(fd, "w", encoding="utf-8") as fp:
             fp.write(html)
         webbrowser.open("file://" + caminho)
+
+    def _dados_export(self, res) -> dict:
+        """Reúne os dados atuais do formulário para exportação."""
+        return {
+            "nome": self.var_nome.get(), "rg": self.var_rg.get(), "cpf": self.var_cpf.get(),
+            "cargo": self.var_cargo.get(), "faixa": self.var_faixa.get(), "di": self.var_di.get(),
+            "vinculo": self.var_vinculo.get(),
+            "jornada": self.var_jornada.get(),
+            "jornada_nome": JORNADAS.get(self.var_jornada.get(), ""),
+            "desde": self.var_desde.get(), "doe": self.var_doe.get(),
+            "nomeacao": self._get_nomeacao(),
+            "n_meses": res.n_meses,
+            "meses": self._meses_periodo(),
+            "ch": self.ch,
+            "total": res.total, "media": res.media,
+            "tipo_quadro": res.tipo_quadro, "suplementar": res.suplementar,
+        }
+
+    def exportar_excel(self):
+        res = self._resultado_atual()
+        if res is None:
+            messagebox.showerror(APP_TITULO, "Informe o mês/ano final antes de exportar.")
+            return
+        try:
+            from excel_export import gerar_mapa_excel
+        except ImportError:
+            messagebox.showerror(
+                APP_TITULO,
+                "Biblioteca openpyxl não encontrada. Instale com: pip install openpyxl")
+            return
+        nome_base = (self.var_nome.get() or "docente").split()[0].lower() if self.var_nome.get() else "docente"
+        caminho = filedialog.asksaveasfilename(
+            title="Baixar Mapa em Excel", defaultextension=".xlsx",
+            filetypes=[("Planilha do Excel", "*.xlsx"), ("Todos", "*.*")],
+            initialfile=f"mapa_carga_horaria_{nome_base}.xlsx",
+        )
+        if not caminho:
+            return
+        try:
+            gerar_mapa_excel(self._dados_export(res), caminho)
+        except Exception as e:  # noqa: BLE001
+            messagebox.showerror(APP_TITULO, f"Não foi possível gerar o Excel:\n{e}")
+            return
+        if messagebox.askyesno(APP_TITULO, "Excel gerado com sucesso!\n\nDeseja abrir o arquivo agora?"):
+            try:
+                if hasattr(os, "startfile"):
+                    os.startfile(caminho)  # Windows
+                else:
+                    webbrowser.open("file://" + caminho)
+            except OSError:
+                webbrowser.open("file://" + caminho)
 
     def _gerar_html(self, res) -> str:
         from html import escape

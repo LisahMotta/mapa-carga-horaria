@@ -1,3 +1,5 @@
-# O aplicativo usa apenas a biblioteca padrão do Python (tkinter).
-# A única dependência é para GERAR o executável (dist/):
+# A interface usa a biblioteca padrão do Python (tkinter).
+# openpyxl é usada para exportar o Mapa em Excel (.xlsx):
+openpyxl>=3.1
+# pyinstaller é usada para GERAR o executável (dist/):
 pyinstaller>=6.0

@@ -16,13 +16,20 @@ e podendo ser distribuído como **executável único** (`.exe` no Windows).
 - **Salvar / Abrir** mapas em arquivo `.json`.
 - **Exportar / Imprimir**: gera um HTML pronto para impressão e o abre no navegador
   (use "Imprimir" → "Salvar como PDF").
+- **Baixar Excel (.xlsx)**: gera o mapa em planilha do Excel, com o layout do formulário
+  oficial ANEXO III (quadro anual, TOTAIS, 7.A, campo 8, declaração e campo 10), pronta
+  para conferir e imprimir no Excel.
+- **Calculadora — carga horária quebrada no mês**: para períodos inferiores a um mês
+  (Jornada ÷ 30 × nº de dias), com opção de somar dois períodos.
 - Botão **Exemplo** e **Preenchimento rápido**.
 
 ## Executar a partir do código-fonte
 
-Requer **Python 3.10+** com **tkinter** (incluso no instalador oficial do python.org).
+Requer **Python 3.10+** com **tkinter** (incluso no instalador oficial do python.org) e a
+biblioteca **openpyxl** (para a exportação em Excel).
 
 ```bash
+pip install -r requirements.txt   # instala openpyxl (e pyinstaller)
 # Linux (tkinter pode precisar ser instalado):
 #   Ubuntu/Debian: sudo apt install python3-tk
 #   Fedora:        sudo dnf install python3-tkinter
@@ -87,6 +94,7 @@ python -m unittest test_calculo -v
 ```
 mapa_carga_horaria.py  # aplicativo (interface Tkinter)
 calculo.py             # lógica de cálculo (sem dependência de GUI)
+excel_export.py        # geração do Mapa em Excel (.xlsx) no layout oficial
 test_calculo.py        # testes automatizados da lógica
 mapa.spec              # configuração do PyInstaller
 build.bat / build.sh   # scripts de geração do executável
