@@ -32,7 +32,20 @@ python3 mapa_carga_horaria.py
 No Windows, basta ter o Python instalado e dar duplo clique em `mapa_carga_horaria.py`
 (ou `python mapa_carga_horaria.py`).
 
-## Gerar o executável (`dist/`)
+## Baixar o `.exe` pronto (Windows) — sem instalar nada
+
+Um workflow do GitHub Actions compila o executável automaticamente em um runner Windows.
+Para baixar o `.exe` já pronto:
+
+1. No GitHub, abra a aba **Actions** → workflow **"Build Windows EXE"**.
+2. Clique na execução mais recente (verde ✔).
+3. Na seção **Artifacts**, baixe **`MapaCargaHoraria-windows`** (um `.zip`).
+4. Extraia e execute **`MapaCargaHoraria.exe`** — não requer Python instalado.
+
+> Para disparar manualmente: aba **Actions** → **Build Windows EXE** → **Run workflow**.
+> Ao publicar uma tag `v*` (ex.: `v1.0`), o `.exe` também é anexado a uma **Release**.
+
+## Gerar o executável localmente (`dist/`)
 
 O empacotamento usa **PyInstaller** e produz um executável único.
 

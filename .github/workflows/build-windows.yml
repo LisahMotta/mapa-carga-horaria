@@ -1,0 +1,57 @@
+name: Build Windows EXE
+
+# Gera o executável do Mapa de Carga Horária (.exe) em um runner Windows.
+# O .exe fica disponível para download como "Artifact" ao final da execução,
+# e também é anexado a uma Release quando uma tag "v*" é publicada.
+
+on:
+  push:
+    branches:
+      - claude/teacher-workload-retirement-app-rbob0f
+      - main
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/build-windows.yml'
+    tags:
+      - 'v*'
+  workflow_dispatch: {}   # permite disparar manualmente pela aba "Actions"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências de build
+        working-directory: desktop
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Rodar testes da lógica de cálculo
+        working-directory: desktop
+        run: python -m unittest test_calculo -v
+
+      - name: Gerar executável com PyInstaller
+        working-directory: desktop
+        run: python -m PyInstaller --noconfirm mapa.spec
+
+      - name: Publicar o .exe como Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MapaCargaHoraria-windows
+          path: desktop/dist/MapaCargaHoraria.exe
+          if-no-files-found: error
+
+      - name: Anexar o .exe à Release (somente em tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: desktop/dist/MapaCargaHoraria.exe
