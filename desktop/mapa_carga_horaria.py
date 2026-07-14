@@ -27,13 +27,13 @@ APP_TITULO = "Mapa de Carga Horária — Cálculo de Proventos"
 
 
 def mes_final_padrao() -> str:
-    """Mês anterior ao atual, no formato AAAA-MM."""
+    """Mês anterior ao atual, no formato MM/AAAA."""
     hoje = date.today()
     ano, mes = hoje.year, hoje.month - 1
     if mes < 1:
         mes = 12
         ano -= 1
-    return f"{ano}-{mes:02d}"
+    return f"{mes:02d}/{ano}"
 
 
 class MapaApp(ttk.Frame):
@@ -176,8 +176,8 @@ class MapaApp(ttk.Frame):
         self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
         self.cbo_jornada.bind("<<ComboboxSelected>>", lambda e: self._on_jornada())
         r += 1
-        campo("Incluído a partir de (6) — AAAA-MM-DD", self.var_desde, 0, span=2)
-        campo("Publicação DOE (6) — AAAA-MM-DD", self.var_doe, 2, span=2)
+        campo("Incluído a partir de (6) — DD/MM/AAAA", self.var_desde, 0, span=2)
+        campo("Publicação DOE (6) — DD/MM/AAAA", self.var_doe, 2, span=2)
         r += 1
 
         self._secao(f, "8 · Nomeação/Designação em regime de 40 horas/semanais")
@@ -201,7 +201,7 @@ class MapaApp(ttk.Frame):
         self.cbo_periodo.grid(sticky=(E, W))
         self.cbo_periodo.set(PERIODOS[60])
         self.cbo_periodo.bind("<<ComboboxSelected>>", lambda e: self._on_periodo())
-        campo("Mês/ano final (AAAA-MM)", self.var_mesfinal, 2, span=2)
+        campo("Mês/ano final (MM/AAAA)", self.var_mesfinal, 2, span=2)
         self.var_mesfinal.trace_add("write", lambda *a: self._montar_tabela())
         r += 1
         fillwrap = ttk.Frame(f)
@@ -301,7 +301,7 @@ class MapaApp(ttk.Frame):
     def _meses_periodo(self):
         mf = self.var_mesfinal.get().strip()
         try:
-            ano, mes = mf.split("-")
+            mes, ano = mf.split("/")
             ano, mes = int(ano), int(mes) - 1
             if not (0 <= mes <= 11):
                 return []
@@ -346,7 +346,8 @@ class MapaApp(ttk.Frame):
         jn = JORNADAS.get(self.var_jornada.get(), "")
         resumo = (
             f"Nome: {self.var_nome.get()}\n"
-            f"RG/CPF: {self.var_rg.get()}  {self.var_cpf.get()}\n"
+            f"RG: {self.var_rg.get()}\n"
+            f"CPF: {self.var_cpf.get()}\n"
             f"Cargo: {self.var_cargo.get()}   Faixa/Nível: {self.var_faixa.get()}   DI: {self.var_di.get()}\n"
             f"Vínculo: {vinc}\n"
             f"Jornada atual: {jn} — {self.var_jornada.get()} horas\n"
@@ -472,8 +473,8 @@ class MapaApp(ttk.Frame):
         self.var_vinculo.set("titular")
         self.var_jornada.set(150)
         self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
-        self.var_desde.set("2015-02-01")
-        self.var_doe.set("2015-02-05")
+        self.var_desde.set("01/02/2015")
+        self.var_doe.set("05/02/2015")
         self._set_nomeacao("Vice-Diretor de Escola, de 01/02/2016 a 31/12/2018 (DOE 05/02/2016).")
         self.var_periodo.set(60)
         self.cbo_periodo.set(PERIODOS[60])
@@ -550,8 +551,9 @@ tfoot td{{background:#e6f2ec;font-weight:700;}}
 </style></head><body>
 <div class='map'>
 <div class='hd'><h3>Mapa de Carga Horária</h3><small>ANEXO III · SEDUC / DIPES / DVIF — cálculo de proventos</small></div>
-<div class='row r2'><div class='c'><small>1 · Nome</small>{escape(self.var_nome.get()) or '&nbsp;'}</div>
-<div class='c'><small>2 · RG / CPF</small>{escape(self.var_rg.get())} {escape(self.var_cpf.get())}</div></div>
+<div class='row r3'><div class='c'><small>1 · Nome</small>{escape(self.var_nome.get()) or '&nbsp;'}</div>
+<div class='c'><small>2 · RG</small>{escape(self.var_rg.get()) or '&nbsp;'}</div>
+<div class='c'><small>2 · CPF</small>{escape(self.var_cpf.get()) or '&nbsp;'}</div></div>
 <div class='row r4'><div class='c'><small>3 · Cargo</small>{escape(self.var_cargo.get()) or '&nbsp;'}</div>
 <div class='c'><small>4 · Faixa/Nível</small>{escape(self.var_faixa.get()) or '&nbsp;'}</div>
 <div class='c'><small>4 · DI</small>{escape(self.var_di.get()) or '&nbsp;'}</div>

@@ -41,14 +41,15 @@ function defaultMesFinal() {
   // mês anterior ao atual como padrão razoável
   d.setDate(1);
   d.setMonth(d.getMonth() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  return `${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`; // MM/AAAA
 }
 
-/* Retorna a lista de {ano, mes(0-based)} dos `periodo` meses que terminam em mesFinal. */
+/* Retorna a lista de {ano, mes(0-based)} dos `periodo` meses que terminam em mesFinal (MM/AAAA). */
 function periodoMeses() {
   const out = [];
   if (!state.mesFinal) return out;
-  const [ay, am] = state.mesFinal.split('-').map(Number);
+  const [am, ay] = state.mesFinal.split('/').map(Number);
+  if (!ay || !am || am < 1 || am > 12) return out;
   let y = ay, m = am - 1; // 0-based
   for (let i = 0; i < state.periodo; i++) {
     out.push({ ano: y, mes: m });
@@ -165,12 +166,6 @@ function esc(s) {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
-function fmtData(iso) {
-  if (!iso) return '';
-  const [y, m, d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
-
 function renderMapa() {
   const r = calcular();
   const vinc = state.vinculo === 'titular' ? 'Titular de Cargo' : 'Ocupante de Função-Atividade (OFA)';
@@ -225,9 +220,10 @@ function renderMapa() {
       <small>Quadro da carga horária para cálculo de proventos — ANEXO III · SEDUC / DIPES / Unidade Regional de Ensino</small>
     </div>
 
-    <div class="mapa__row r-2">
+    <div class="mapa__row r-3">
       <div class="mapa__cell"><span class="lbl">1 · Nome</span><span class="val">${esc(state.nome) || '&nbsp;'}</span></div>
-      <div class="mapa__cell"><span class="lbl">2 · RG / CPF</span><span class="val">${esc(state.rg)} ${state.rg && state.cpf ? '·' : ''} ${esc(state.cpf)}</span></div>
+      <div class="mapa__cell"><span class="lbl">2 · RG</span><span class="val">${esc(state.rg) || '&nbsp;'}</span></div>
+      <div class="mapa__cell"><span class="lbl">2 · CPF</span><span class="val">${esc(state.cpf) || '&nbsp;'}</span></div>
     </div>
     <div class="mapa__row r-4">
       <div class="mapa__cell"><span class="lbl">3 · Cargo/Função</span><span class="val">${esc(state.cargo) || '&nbsp;'}</span></div>
@@ -237,8 +233,8 @@ function renderMapa() {
     </div>
     <div class="mapa__row r-3">
       <div class="mapa__cell"><span class="lbl">6 · Jornada atual</span><span class="val">${jornadaNome} — ${state.jornada} horas</span></div>
-      <div class="mapa__cell"><span class="lbl">6 · Incluído a partir de</span><span class="val">${fmtData(state.jornadaDesde) || '&nbsp;'}</span></div>
-      <div class="mapa__cell"><span class="lbl">6 · DOE</span><span class="val">${fmtData(state.doe) || '&nbsp;'}</span></div>
+      <div class="mapa__cell"><span class="lbl">6 · Incluído a partir de</span><span class="val">${esc(state.jornadaDesde) || '&nbsp;'}</span></div>
+      <div class="mapa__cell"><span class="lbl">6 · DOE</span><span class="val">${esc(state.doe) || '&nbsp;'}</span></div>
     </div>
 
     <div class="mapa__row"><div class="mapa__badge">7 · Carga horária — período de opção: ${r.nMeses} meses</div></div>
@@ -277,8 +273,18 @@ function carregar() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     Object.assign(state, JSON.parse(raw));
+    migrarFormatoDatas();
     return true;
   } catch (e) { return false; }
+}
+
+/* Converte dados salvos no formato antigo (ISO) para DD/MM/AAAA e MM/AAAA. */
+function migrarFormatoDatas() {
+  const isoDia = (s) => /^\d{4}-\d{2}-\d{2}$/.test(s || '');
+  const isoMes = (s) => /^\d{4}-\d{2}$/.test(s || '');
+  if (isoDia(state.jornadaDesde)) { const [y, m, d] = state.jornadaDesde.split('-'); state.jornadaDesde = `${d}/${m}/${y}`; }
+  if (isoDia(state.doe)) { const [y, m, d] = state.doe.split('-'); state.doe = `${d}/${m}/${y}`; }
+  if (isoMes(state.mesFinal)) { const [y, m] = state.mesFinal.split('-'); state.mesFinal = `${m}/${y}`; }
 }
 
 /* ---------- vincular controles ---------- */
@@ -349,7 +355,7 @@ function carregarExemplo() {
     rg: '12.345.678-9', cpf: '123.456.789-00',
     cargo: 'PEB II', faixa: 'Faixa 5 / Nível I', di: '001',
     vinculo: 'titular', jornada: 150,
-    jornadaDesde: '2015-02-01', doe: '2015-02-05',
+    jornadaDesde: '01/02/2015', doe: '05/02/2015',
     nomeacao: 'Vice-Diretor de Escola, de 01/02/2016 a 31/12/2018 (DOE 05/02/2016).',
     periodo: 60, mesFinal: defaultMesFinal(), ch: {}
   });
