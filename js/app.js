@@ -1,6 +1,6 @@
 /* ============================================================
    Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
-   ANEXO III — SEDUC / DIPES / DVIF
+   ANEXO III — SEDUC / DIPES / COGEF / DTEMP
    Lógica de cálculo baseada na LC 836/97 (Art. 39 DDTT).
    ============================================================ */
 
