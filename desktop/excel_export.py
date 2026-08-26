@@ -157,18 +157,21 @@ def gerar_mapa_excel(dados: Dict, caminho: str) -> None:
     _merge(ws, "A5:A6")
     _cell(ws, "A5", 6, font=F_NUM, align=CENTRO)
     j = int(dados["jornada"])
+    tabela = dados.get("jornada_tabela", "")
+    # Linha "Preencher Quadro": jornadas da carreira selecionada, com X na escolhida
+    jornadas_carr = dados.get("jornadas_carreira", [])
+    partes = "    ".join(
+        f"( {_marca(int(jc['tabela']) == int(tabela))} ) T{jc['tabela']} Jornada {jc['nome']}"
+        for jc in jornadas_carr
+    )
     _merge(ws, f"B5:{tl}5")
     _cell(ws, "B5",
-          "Preencher Quadro:   "
-          f"( {_marca(j == 96)} ) Jornada Reduzida    "
-          f"( {_marca(j == 120)} ) Jornada Inicial    "
-          f"( {_marca(j == 150)} ) Jornada Básica    "
-          f"( {_marca(j == 200)} ) Jornada Completa",
+          f"Carreira: {dados.get('carreira_nome', '')}   —   Preencher Quadro:   {partes}",
           font=F_TXT, align=ESQ)
     _merge(ws, f"B6:{tl}6")
     _cell(ws, "B6",
           f"Titular de Cargo atualmente incluído na Jornada {dados['jornada_nome']}, "
-          f"a partir de {dados['desde']}, DOE {dados['doe']}  ( {j} horas = Tabela   )",
+          f"a partir de {dados['desde']}, DOE {dados['doe']}  ( {j} horas = Tabela {tabela} )",
           font=F_TXT, align=ESQ)
     ws.row_dimensions[5].height = 16
     ws.row_dimensions[6].height = 16

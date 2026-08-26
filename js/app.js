@@ -20,17 +20,63 @@ const JORNADAS = {
   200: 'Jornada Completa'
 };
 
+/* Carreiras e jornadas, com a tabela a que cada jornada pertence. */
+const CARREIRAS = {
+  antiga: {
+    rotulo: 'Antiga carreira',
+    jornadas: [
+      { tabela: 1, nome: 'Integral', horas: 200 },
+      { tabela: 2, nome: 'Básica', horas: 150 },
+      { tabela: 3, nome: 'Inicial', horas: 120 },
+      { tabela: 4, nome: 'Reduzida', horas: 96 }
+    ]
+  },
+  nova: {
+    rotulo: 'Nova carreira',
+    jornadas: [
+      { tabela: 1, nome: 'Ampliada', horas: 200 },
+      { tabela: 2, nome: 'Completa', horas: 125 }
+    ]
+  }
+};
+
+function infoJornada(carreira, tabela) {
+  const list = (CARREIRAS[carreira] || CARREIRAS.antiga).jornadas;
+  return list.find((j) => j.tabela === Number(tabela)) || list[0];
+}
+
 /* Estado da aplicação. ch: mapa "YYYY-MM" -> horas (número). */
 const state = {
   nome: '', rg: '', cpf: '', cargo: 'PEB', faixa: '', di: '',
   vinculo: 'titular',
+  carreira: 'antiga',
+  jornadaTabela: 2,
   jornada: 150,
+  jornadaNome: 'Básica',
   jornadaDesde: '', doe: '',
   nomeacao: '',
   periodo: 60,
   mesFinal: '',
   ch: {}
 };
+
+/* Recalcula jornada (horas) e nome a partir de carreira + tabela. */
+function aplicarJornada() {
+  const info = infoJornada(state.carreira, state.jornadaTabela);
+  state.jornada = info.horas;
+  state.jornadaNome = info.nome;
+  state.jornadaTabela = info.tabela;
+}
+
+/* Preenche o <select id="jornada"> conforme a carreira selecionada. */
+function popularJornadas() {
+  const sel = document.querySelector('#jornada');
+  if (!sel) return;
+  const list = (CARREIRAS[state.carreira] || CARREIRAS.antiga).jornadas;
+  sel.innerHTML = list.map((j) =>
+    `<option value="${j.tabela}">Tabela ${j.tabela} — Jornada ${j.nome} — ${j.horas} horas</option>`).join('');
+  sel.value = String(state.jornadaTabela);
+}
 
 /* ---------- utilidades ---------- */
 const $ = (sel) => document.querySelector(sel);
@@ -169,7 +215,7 @@ function esc(s) {
 function renderMapa() {
   const r = calcular();
   const vinc = state.vinculo === 'titular' ? 'Titular de Cargo' : 'Ocupante de Função-Atividade (OFA)';
-  const jornadaNome = JORNADAS[state.jornada] || '';
+  const carreiraNome = (CARREIRAS[state.carreira] || CARREIRAS.antiga).rotulo;
 
   const anos = anosDoPeriodo(r.meses);
   const ativos = r.ativos;
@@ -232,7 +278,7 @@ function renderMapa() {
       <div class="mapa__cell"><span class="lbl">5 · Vínculo</span><span class="val">${vinc}</span></div>
     </div>
     <div class="mapa__row r-3">
-      <div class="mapa__cell"><span class="lbl">6 · Jornada atual</span><span class="val">${jornadaNome} — ${state.jornada} horas</span></div>
+      <div class="mapa__cell"><span class="lbl">6 · Jornada atual (${esc(carreiraNome)})</span><span class="val">Jornada ${esc(state.jornadaNome)} — Tabela ${state.jornadaTabela} — ${state.jornada} horas</span></div>
       <div class="mapa__cell"><span class="lbl">6 · Incluído a partir de</span><span class="val">${esc(state.jornadaDesde) || '&nbsp;'}</span></div>
       <div class="mapa__cell"><span class="lbl">6 · DOE</span><span class="val">${esc(state.doe) || '&nbsp;'}</span></div>
     </div>
@@ -274,8 +320,19 @@ function carregar() {
     if (!raw) return false;
     Object.assign(state, JSON.parse(raw));
     migrarFormatoDatas();
+    reconciliarJornada();
     return true;
   } catch (e) { return false; }
+}
+
+/* Ajusta carreira/tabela de dados salvos antigos (que só tinham jornada em horas). */
+function reconciliarJornada() {
+  if (!state.carreira) state.carreira = 'antiga';
+  const list = (CARREIRAS[state.carreira] || CARREIRAS.antiga).jornadas;
+  const byTab = list.find((j) => j.tabela === Number(state.jornadaTabela));
+  if (byTab && byTab.horas === Number(state.jornada)) return; // já consistente
+  const byHoras = list.find((j) => j.horas === Number(state.jornada));
+  if (byHoras) state.jornadaTabela = byHoras.tabela;
 }
 
 /* Converte dados salvos no formato antigo (ISO) para DD/MM/AAAA e MM/AAAA. */
@@ -307,9 +364,22 @@ function bindForm() {
     });
   });
 
+  const selCarreira = $('#carreira');
   const selJornada = $('#jornada');
-  selJornada.value = String(state.jornada);
-  selJornada.addEventListener('change', () => { state.jornada = Number(selJornada.value); renderMapa(); salvar(); });
+  selCarreira.value = state.carreira;
+  popularJornadas();
+  selCarreira.addEventListener('change', () => {
+    state.carreira = selCarreira.value;
+    state.jornadaTabela = (CARREIRAS[state.carreira] || CARREIRAS.antiga).jornadas[0].tabela;
+    aplicarJornada();
+    popularJornadas();
+    renderMapa(); salvar();
+  });
+  selJornada.addEventListener('change', () => {
+    state.jornadaTabela = Number(selJornada.value);
+    aplicarJornada();
+    renderMapa(); salvar();
+  });
 
   const selPeriodo = $('#periodo');
   selPeriodo.value = String(state.periodo);
@@ -413,7 +483,8 @@ function limpar() {
   localStorage.removeItem(STORAGE_KEY);
   Object.assign(state, {
     nome: '', rg: '', cpf: '', cargo: 'PEB', faixa: '', di: '',
-    vinculo: 'titular', jornada: 150, jornadaDesde: '', doe: '', nomeacao: '',
+    vinculo: 'titular', carreira: 'antiga', jornadaTabela: 2, jornada: 150, jornadaNome: 'Básica',
+    jornadaDesde: '', doe: '', nomeacao: '',
     periodo: 60, mesFinal: defaultMesFinal(), ch: {}
   });
   sincronizarForm();
@@ -425,7 +496,7 @@ function carregarExemplo() {
     nome: 'MARIA DA SILVA SANTOS',
     rg: '12.345.678-9', cpf: '123.456.789-00',
     cargo: 'PEB II', faixa: 'Faixa 5 / Nível I', di: '001',
-    vinculo: 'titular', jornada: 150,
+    vinculo: 'titular', carreira: 'antiga', jornadaTabela: 2, jornada: 150, jornadaNome: 'Básica',
     jornadaDesde: '01/02/2015', doe: '05/02/2015',
     nomeacao: 'Vice-Diretor de Escola, de 01/02/2016 a 31/12/2018 (DOE 05/02/2016).',
     periodo: 60, mesFinal: defaultMesFinal(), ch: {}
@@ -444,7 +515,9 @@ function sincronizarForm() {
   $('#cargo').value = state.cargo; $('#faixa').value = state.faixa; $('#di').value = state.di;
   $('#jornada-desde').value = state.jornadaDesde; $('#doe').value = state.doe;
   $('#nomeacao').value = state.nomeacao || '';
-  $('#jornada').value = String(state.jornada);
+  aplicarJornada();
+  $('#carreira').value = state.carreira;
+  popularJornadas();
   $('#periodo').value = String(state.periodo);
   $('#mes-final').value = state.mesFinal;
   document.querySelectorAll('input[name="vinculo"]').forEach((r) => { r.checked = r.value === state.vinculo; });

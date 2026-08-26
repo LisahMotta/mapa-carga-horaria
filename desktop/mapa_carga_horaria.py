@@ -21,7 +21,8 @@ from tkinter import (
 )
 
 from calculo import (
-    MESES, JORNADAS, PERIODOS, chave, periodo_meses, anos_do_periodo, calcular,
+    MESES, JORNADAS, PERIODOS, CARREIRAS, chave, periodo_meses, anos_do_periodo, calcular,
+    jornadas_da_carreira, info_jornada,
 )
 
 APP_TITULO = "Mapa de Carga Horária — Cálculo de Proventos"
@@ -166,6 +167,8 @@ class MapaApp(ttk.Frame):
         self.var_faixa = StringVar()
         self.var_di = StringVar()
         self.var_vinculo = StringVar(value="titular")
+        self.var_carreira = StringVar(value="antiga")
+        self.var_jornada_tabela = IntVar(value=2)
         self.var_jornada = IntVar(value=150)
         self.var_desde = StringVar()
         self.var_doe = StringVar()
@@ -291,12 +294,18 @@ class MapaApp(ttk.Frame):
         jwrap = ttk.Frame(f)
         jwrap.grid(row=r, column=2, columnspan=2, sticky=(E, W), padx=4)
         jwrap.columnconfigure(0, weight=1)
-        ttk.Label(jwrap, text="Jornada atual (6)", font=("Segoe UI", 8)).grid(sticky="w")
-        self.cbo_jornada = ttk.Combobox(jwrap, state="readonly",
-                                         values=[f"{n} — {h} horas" for h, n in JORNADAS.items()])
-        self.cbo_jornada.grid(sticky=(E, W))
-        self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
+        ttk.Label(jwrap, text="Carreira (6)", font=("Segoe UI", 8)).grid(row=0, column=0, sticky="w")
+        self.cbo_carreira = ttk.Combobox(jwrap, state="readonly",
+                                         values=[CARREIRAS[k]["rotulo"] for k in ("antiga", "nova")])
+        self.cbo_carreira.grid(row=1, column=0, sticky=(E, W))
+        self.cbo_carreira.set(CARREIRAS["antiga"]["rotulo"])
+        self.cbo_carreira.bind("<<ComboboxSelected>>", lambda e: self._on_carreira())
+        ttk.Label(jwrap, text="Jornada atual — Tabela (6)", font=("Segoe UI", 8)).grid(
+            row=2, column=0, sticky="w", pady=(4, 0))
+        self.cbo_jornada = ttk.Combobox(jwrap, state="readonly")
+        self.cbo_jornada.grid(row=3, column=0, sticky=(E, W))
         self.cbo_jornada.bind("<<ComboboxSelected>>", lambda e: self._on_jornada())
+        self._popular_jornadas()
         r += 1
         campo("Incluído a partir de (6) — DD/MM/AAAA", self.var_desde, 0, span=2)
         campo("Publicação DOE (6) — DD/MM/AAAA", self.var_doe, 2, span=2)
@@ -548,12 +557,34 @@ class MapaApp(ttk.Frame):
                  f"► Total do mês: {total:g} horas  ({j:g} + {supl:g})",
             foreground="#2f7d5b")
 
+    def _info_jornada(self) -> dict:
+        return info_jornada(self.var_carreira.get(), self.var_jornada_tabela.get())
+
+    def _popular_jornadas(self):
+        """Atualiza a lista de jornadas conforme a carreira e a seleção atual."""
+        js = jornadas_da_carreira(self.var_carreira.get())
+        self.cbo_jornada["values"] = [
+            f"Tabela {j['tabela']} — Jornada {j['nome']} — {j['horas']} horas" for j in js]
+        idx = next((i for i, j in enumerate(js)
+                    if j["tabela"] == self.var_jornada_tabela.get()), 0)
+        self.cbo_jornada.current(idx)
+        self.var_jornada_tabela.set(js[idx]["tabela"])
+        self.var_jornada.set(js[idx]["horas"])
+
+    def _on_carreira(self):
+        rot = self.cbo_carreira.get()
+        carr = "nova" if rot == CARREIRAS["nova"]["rotulo"] else "antiga"
+        self.var_carreira.set(carr)
+        self.var_jornada_tabela.set(jornadas_da_carreira(carr)[0]["tabela"])
+        self._popular_jornadas()
+        self._atualizar_resultado()
+
     def _on_jornada(self):
-        txt = self.cbo_jornada.get()
-        for h, n in JORNADAS.items():
-            if txt.startswith(n):
-                self.var_jornada.set(h)
-                break
+        idx = self.cbo_jornada.current()
+        js = jornadas_da_carreira(self.var_carreira.get())
+        if 0 <= idx < len(js):
+            self.var_jornada_tabela.set(js[idx]["tabela"])
+            self.var_jornada.set(js[idx]["horas"])
         self._atualizar_resultado()
 
     def _on_periodo(self):
@@ -582,14 +613,15 @@ class MapaApp(ttk.Frame):
             lbl.configure(text=str(res.totais_anuais.get(a, 0)))
 
         vinc = "Titular de Cargo" if self.var_vinculo.get() == "titular" else "Ocupante de Função-Atividade (OFA)"
-        jn = JORNADAS.get(self.var_jornada.get(), "")
+        info = self._info_jornada()
+        carr = CARREIRAS.get(self.var_carreira.get(), CARREIRAS["antiga"])["rotulo"]
         resumo = (
             f"Nome: {self.var_nome.get()}\n"
             f"RG: {self.var_rg.get()}\n"
             f"CPF: {self.var_cpf.get()}\n"
             f"Cargo: {self.var_cargo.get()}   Faixa/Nível: {self.var_faixa.get()}   DI: {self.var_di.get()}\n"
-            f"Vínculo: {vinc}\n"
-            f"Jornada atual: {jn} — {self.var_jornada.get()} horas\n"
+            f"Vínculo: {vinc}   Carreira: {carr}\n"
+            f"Jornada atual: {info['nome']} (Tabela {info['tabela']}) — {info['horas']} horas\n"
             f"Período de opção: {res.n_meses} meses\n"
             f"7.A · Total geral: {res.total} horas\n"
             f"Média (7.A ÷ {res.n_meses}): {res.media}"
@@ -634,8 +666,10 @@ class MapaApp(ttk.Frame):
             var.set(dflt)
         self._set_nomeacao("")
         self.var_vinculo.set("titular")
-        self.var_jornada.set(150)
-        self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
+        self.var_carreira.set("antiga")
+        self.cbo_carreira.set(CARREIRAS["antiga"]["rotulo"])
+        self.var_jornada_tabela.set(2)
+        self._popular_jornadas()
         self.var_periodo.set(60)
         self.cbo_periodo.set(PERIODOS[60])
         self.var_mesfinal.set(mes_final_padrao())
@@ -653,7 +687,9 @@ class MapaApp(ttk.Frame):
         return {
             "nome": self.var_nome.get(), "rg": self.var_rg.get(), "cpf": self.var_cpf.get(),
             "cargo": self.var_cargo.get(), "faixa": self.var_faixa.get(), "di": self.var_di.get(),
-            "vinculo": self.var_vinculo.get(), "jornada": self.var_jornada.get(),
+            "vinculo": self.var_vinculo.get(),
+            "carreira": self.var_carreira.get(), "jornada_tabela": self.var_jornada_tabela.get(),
+            "jornada": self.var_jornada.get(),
             "desde": self.var_desde.get(), "doe": self.var_doe.get(),
             "nomeacao": self._get_nomeacao(),
             "periodo": self.var_periodo.get(), "mes_final": self.var_mesfinal.get(),
@@ -668,8 +704,20 @@ class MapaApp(ttk.Frame):
         self.var_faixa.set(d.get("faixa", ""))
         self.var_di.set(d.get("di", ""))
         self.var_vinculo.set(d.get("vinculo", "titular"))
-        self.var_jornada.set(int(d.get("jornada", 150)))
-        self.cbo_jornada.set(f"{JORNADAS.get(self.var_jornada.get(), 'Jornada Básica')} — {self.var_jornada.get()} horas")
+        carr = d.get("carreira", "antiga")
+        if carr not in CARREIRAS:
+            carr = "antiga"
+        self.var_carreira.set(carr)
+        self.cbo_carreira.set(CARREIRAS[carr]["rotulo"])
+        # tabela: usa a salva; se não houver, deduz pelas horas na carreira
+        if "jornada_tabela" in d:
+            self.var_jornada_tabela.set(int(d.get("jornada_tabela", 2)))
+        else:
+            horas = int(d.get("jornada", 150))
+            js = jornadas_da_carreira(carr)
+            self.var_jornada_tabela.set(next((j["tabela"] for j in js if j["horas"] == horas),
+                                             js[0]["tabela"]))
+        self._popular_jornadas()
         self.var_desde.set(d.get("desde", ""))
         self.var_doe.set(d.get("doe", ""))
         self._set_nomeacao(d.get("nomeacao", ""))
@@ -710,8 +758,10 @@ class MapaApp(ttk.Frame):
         self.var_faixa.set("Faixa 5 / Nível I")
         self.var_di.set("001")
         self.var_vinculo.set("titular")
-        self.var_jornada.set(150)
-        self.cbo_jornada.set(f"{JORNADAS[150]} — 150 horas")
+        self.var_carreira.set("antiga")
+        self.cbo_carreira.set(CARREIRAS["antiga"]["rotulo"])
+        self.var_jornada_tabela.set(2)
+        self._popular_jornadas()
         self.var_desde.set("01/02/2015")
         self.var_doe.set("05/02/2015")
         self._set_nomeacao("Vice-Diretor de Escola, de 01/02/2016 a 31/12/2018 (DOE 05/02/2016).")
@@ -741,8 +791,12 @@ class MapaApp(ttk.Frame):
             "nome": self.var_nome.get(), "rg": self.var_rg.get(), "cpf": self.var_cpf.get(),
             "cargo": self.var_cargo.get(), "faixa": self.var_faixa.get(), "di": self.var_di.get(),
             "vinculo": self.var_vinculo.get(),
+            "carreira": self.var_carreira.get(),
+            "carreira_nome": CARREIRAS.get(self.var_carreira.get(), CARREIRAS["antiga"])["rotulo"],
             "jornada": self.var_jornada.get(),
-            "jornada_nome": JORNADAS.get(self.var_jornada.get(), ""),
+            "jornada_nome": self._info_jornada()["nome"],
+            "jornada_tabela": self._info_jornada()["tabela"],
+            "jornadas_carreira": jornadas_da_carreira(self.var_carreira.get()),
             "desde": self.var_desde.get(), "doe": self.var_doe.get(),
             "nomeacao": self._get_nomeacao(),
             "n_meses": res.n_meses,
@@ -792,7 +846,9 @@ class MapaApp(ttk.Frame):
         anos = anos_do_periodo(meses)
         ativos = {chave(a, m) for a, m in meses}
         vinc = "Titular de Cargo" if self.var_vinculo.get() == "titular" else "Ocupante de Função-Atividade (OFA)"
-        jn = JORNADAS.get(self.var_jornada.get(), "")
+        info = self._info_jornada()
+        carr = CARREIRAS.get(self.var_carreira.get(), CARREIRAS["antiga"])["rotulo"]
+        jornada_txt = f"Jornada {info['nome']} — Tabela {info['tabela']} — {info['horas']} horas"
         nomeacao = escape(self._get_nomeacao()) or "<span style='color:#8a94a3'>Não há.</span>"
 
         linhas = ""
@@ -847,8 +903,8 @@ tfoot td{{background:#e6f2ec;font-weight:700;}}
 <div class='row r4'><div class='c'><small>3 · Cargo</small>{escape(self.var_cargo.get()) or '&nbsp;'}</div>
 <div class='c'><small>4 · Faixa/Nível</small>{escape(self.var_faixa.get()) or '&nbsp;'}</div>
 <div class='c'><small>4 · DI</small>{escape(self.var_di.get()) or '&nbsp;'}</div>
-<div class='c'><small>5 · Vínculo</small>{vinc}</div></div>
-<div class='row r3'><div class='c'><small>6 · Jornada atual</small>{jn} — {self.var_jornada.get()} horas</div>
+<div class='c'><small>5 · Vínculo · Carreira</small>{vinc} · {carr}</div></div>
+<div class='row r3'><div class='c'><small>6 · Jornada atual</small>{jornada_txt}</div>
 <div class='c'><small>6 · Incluído a partir de</small>{escape(self.var_desde.get()) or '&nbsp;'}</div>
 <div class='c'><small>6 · DOE</small>{escape(self.var_doe.get()) or '&nbsp;'}</div></div>
 <div class='row'><div class='badge'>7 · Carga horária — período de opção: {res.n_meses} meses</div></div>

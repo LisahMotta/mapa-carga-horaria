@@ -64,13 +64,16 @@
         </fieldset>
 
         <label class="field">
-          <span>Jornada atual <b>(campo 6)</b></span>
-          <select id="jornada">
-            <option value="96">Jornada Reduzida — 96 horas</option>
-            <option value="120">Jornada Inicial — 120 horas</option>
-            <option value="150" selected>Jornada Básica — 150 horas</option>
-            <option value="200">Jornada Completa — 200 horas</option>
+          <span>Carreira <b>(campo 6)</b></span>
+          <select id="carreira">
+            <option value="antiga">Antiga carreira</option>
+            <option value="nova">Nova carreira</option>
           </select>
+        </label>
+
+        <label class="field">
+          <span>Jornada atual — Tabela <b>(campo 6)</b></span>
+          <select id="jornada"><!-- preenchido via JS conforme a carreira --></select>
         </label>
 
         <label class="field" id="wrap-jornada-desde">

@@ -15,13 +15,47 @@ MESES = [
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ]
 
-# Jornadas do PEB (horas mensais) -> nome
+# Jornadas do PEB (horas mensais) -> nome (compatibilidade)
 JORNADAS: Dict[int, str] = {
     96: "Jornada Reduzida",
     120: "Jornada Inicial",
     150: "Jornada Básica",
     200: "Jornada Completa",
 }
+
+# Carreiras e suas jornadas, com a tabela a que pertence cada jornada.
+# Cada jornada: {"tabela": nº, "nome": str, "horas": int (mensais)}
+CARREIRAS: Dict[str, Dict] = {
+    "antiga": {
+        "rotulo": "Antiga carreira",
+        "jornadas": [
+            {"tabela": 1, "nome": "Integral", "horas": 200},
+            {"tabela": 2, "nome": "Básica", "horas": 150},
+            {"tabela": 3, "nome": "Inicial", "horas": 120},
+            {"tabela": 4, "nome": "Reduzida", "horas": 96},
+        ],
+    },
+    "nova": {
+        "rotulo": "Nova carreira",
+        "jornadas": [
+            {"tabela": 1, "nome": "Ampliada", "horas": 200},
+            {"tabela": 2, "nome": "Completa", "horas": 125},
+        ],
+    },
+}
+
+
+def jornadas_da_carreira(carreira: str) -> List[Dict]:
+    return CARREIRAS.get(carreira, CARREIRAS["antiga"])["jornadas"]
+
+
+def info_jornada(carreira: str, tabela: int) -> Dict:
+    """Retorna o dict da jornada pela carreira e nº da tabela (fallback: 1ª)."""
+    js = jornadas_da_carreira(carreira)
+    for j in js:
+        if j["tabela"] == int(tabela):
+            return j
+    return js[0]
 
 # Períodos de opção previstos no manual (nº de meses -> descrição)
 PERIODOS: Dict[int, str] = {
