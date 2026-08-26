@@ -16,7 +16,7 @@ import tempfile
 import webbrowser
 from datetime import date
 from tkinter import (
-    Tk, StringVar, IntVar, Text, PhotoImage, filedialog, messagebox, ttk, Canvas, Frame,
+    Tk, StringVar, IntVar, Text, PhotoImage, Label, filedialog, messagebox, ttk, Canvas, Frame,
     N, S, E, W, END,
 )
 
@@ -37,6 +37,85 @@ _ICONE_PNG_B64 = (
     "0FtdF1TjzgyV0g94c0M6At6Px+1mdjrsp/JyEYamxqDhwhznBsODS54b7FLi5KionW9de53j6Tbv1AAAAABJRU5E"
     "rkJggg=="
 )
+
+
+# Paleta de cores (UI moderna)
+COR_BG = "#eef2f7"        # fundo do app
+COR_CARD = "#ffffff"      # cartões / campos
+COR_BRAND = "#1f4e79"     # azul institucional
+COR_BRAND_D = "#16334f"   # azul escuro
+COR_INK = "#1f2733"       # texto
+COR_MUTED = "#6b7684"     # texto secundário
+COR_LINE = "#d7dee8"      # bordas
+COR_ACCENT = "#2f7d5b"    # verde (ações)
+COR_ACCENT_D = "#276848"  # verde escuro (hover)
+
+
+def configurar_tema(root: Tk) -> None:
+    """Aplica um tema visual moderno aos widgets ttk."""
+    root.configure(bg=COR_BG)
+    st = ttk.Style()
+    try:
+        st.theme_use("clam")
+    except Exception:
+        pass
+
+    fonte = ("Segoe UI", 10)
+    st.configure(".", background=COR_BG, foreground=COR_INK, font=fonte,
+                 focuscolor=COR_BRAND)
+    st.configure("TFrame", background=COR_BG)
+    st.configure("Card.TFrame", background=COR_CARD)
+    st.configure("TLabel", background=COR_BG, foreground=COR_INK)
+    st.configure("Card.TLabel", background=COR_CARD, foreground=COR_INK)
+    st.configure("Muted.TLabel", background=COR_BG, foreground=COR_MUTED)
+    st.configure("Secao.TLabel", background=COR_BG, foreground=COR_BRAND_D,
+                 font=("Segoe UI", 10, "bold"))
+
+    # Campos
+    st.configure("TEntry", fieldbackground=COR_CARD, background=COR_CARD,
+                 bordercolor=COR_LINE, lightcolor=COR_LINE, darkcolor=COR_LINE,
+                 relief="flat", padding=5)
+    st.map("TEntry", bordercolor=[("focus", COR_BRAND)], lightcolor=[("focus", COR_BRAND)])
+    st.configure("TCombobox", fieldbackground=COR_CARD, background=COR_CARD,
+                 bordercolor=COR_LINE, lightcolor=COR_LINE, darkcolor=COR_LINE,
+                 arrowcolor=COR_BRAND, relief="flat", padding=5)
+    st.map("TCombobox", fieldbackground=[("readonly", COR_CARD)],
+           bordercolor=[("focus", COR_BRAND)], arrowcolor=[("active", COR_BRAND_D)])
+
+    # Botões
+    st.configure("TButton", background=COR_CARD, foreground=COR_INK,
+                 bordercolor=COR_LINE, lightcolor=COR_CARD, darkcolor=COR_CARD,
+                 relief="flat", padding=(13, 7), font=("Segoe UI", 10))
+    st.map("TButton",
+           background=[("active", "#e7edf4"), ("pressed", "#dae2ec")],
+           bordercolor=[("active", COR_BRAND)])
+    st.configure("Primary.TButton", background=COR_BRAND, foreground="#ffffff",
+                 bordercolor=COR_BRAND, lightcolor=COR_BRAND, darkcolor=COR_BRAND,
+                 relief="flat", padding=(15, 7), font=("Segoe UI", 10, "bold"))
+    st.map("Primary.TButton", background=[("active", COR_BRAND_D), ("pressed", COR_BRAND_D)])
+    st.configure("Accent.TButton", background=COR_ACCENT, foreground="#ffffff",
+                 bordercolor=COR_ACCENT, lightcolor=COR_ACCENT, darkcolor=COR_ACCENT,
+                 relief="flat", padding=(15, 7), font=("Segoe UI", 10, "bold"))
+    st.map("Accent.TButton", background=[("active", COR_ACCENT_D), ("pressed", COR_ACCENT_D)])
+
+    st.configure("TRadiobutton", background=COR_BG, foreground=COR_INK)
+    st.map("TRadiobutton", background=[("active", COR_BG)],
+           indicatorcolor=[("selected", COR_BRAND)])
+
+    # Cartão do resultado (branco)
+    st.configure("Card.TLabelframe", background=COR_CARD, bordercolor=COR_LINE,
+                 relief="solid", borderwidth=1)
+    st.configure("Card.TLabelframe.Label", background=COR_CARD, foreground=COR_BRAND_D,
+                 font=("Segoe UI", 9, "bold"))
+    st.configure("Media.TLabel", background=COR_CARD, foreground=COR_BRAND, anchor="center")
+    st.configure("MediaSup.TLabel", background=COR_CARD, foreground=COR_ACCENT, anchor="center")
+    st.configure("MediaCap.TLabel", background=COR_CARD, foreground=COR_MUTED, anchor="center")
+    st.configure("Card.Muted.TLabel", background=COR_CARD, foreground=COR_MUTED)
+
+    # Barra de rolagem
+    st.configure("Vertical.TScrollbar", background="#cfd8e3", troughcolor=COR_BG,
+                 bordercolor=COR_BG, arrowcolor=COR_MUTED, relief="flat")
+    st.map("Vertical.TScrollbar", background=[("active", COR_BRAND)])
 
 
 def aplicar_icone(root: Tk) -> None:
@@ -110,27 +189,32 @@ class MapaApp(ttk.Frame):
         self.rowconfigure(2, weight=1)
 
         # Cabeçalho
-        head = Frame(self, bg="#1f4e79")
+        head = Frame(self, bg=COR_BRAND)
         head.grid(row=0, column=0, sticky=(E, W))
-        ttk.Label(
-            head, text="Mapa de Carga Horária",
-            background="#1f4e79", foreground="white",
-            font=("Segoe UI", 15, "bold"),
-        ).pack(side="left", padx=14, pady=(10, 0), anchor="w")
-        ttk.Label(
-            head, text="ANEXO III · SEDUC / COGEF / URE São José dos Campos — cálculo de proventos",
-            background="#1f4e79", foreground="#d6e2ef", font=("Segoe UI", 9),
-        ).pack(side="left", padx=8, pady=(14, 8))
+        Frame(head, bg=COR_ACCENT, height=3).pack(side="bottom", fill="x")
+        try:
+            self._hdr_icon = PhotoImage(data=_ICONE_PNG_B64).subsample(2, 2)
+            Label(head, image=self._hdr_icon, bg=COR_BRAND).pack(side="left", padx=(16, 8), pady=10)
+        except Exception:
+            pass
+        titw = Frame(head, bg=COR_BRAND)
+        titw.pack(side="left", pady=(9, 9), anchor="w")
+        Label(titw, text="Mapa de Carga Horária", bg=COR_BRAND, fg="white",
+              font=("Segoe UI", 15, "bold")).pack(anchor="w")
+        Label(titw, text="ANEXO III · SEDUC / COGEF / URE São José dos Campos — cálculo de proventos",
+              bg=COR_BRAND, fg="#c7d6e6", font=("Segoe UI", 9)).pack(anchor="w")
 
         # Barra de ações
-        bar = ttk.Frame(self, padding=(10, 8))
+        bar = ttk.Frame(self, padding=(12, 10))
         bar.grid(row=1, column=0, sticky=(E, W))
-        ttk.Button(bar, text="Novo", command=self.novo).pack(side="left", padx=2)
-        ttk.Button(bar, text="Abrir…", command=self.abrir).pack(side="left", padx=2)
-        ttk.Button(bar, text="Salvar…", command=self.salvar).pack(side="left", padx=2)
-        ttk.Button(bar, text="Exemplo", command=self.carregar_exemplo).pack(side="left", padx=2)
-        ttk.Button(bar, text="Exportar / Imprimir (HTML/PDF)", command=self.exportar_html).pack(side="left", padx=(8, 2))
-        ttk.Button(bar, text="Baixar Excel (.xlsx)", command=self.exportar_excel).pack(side="left", padx=2)
+        ttk.Button(bar, text="Novo", command=self.novo).pack(side="left", padx=3)
+        ttk.Button(bar, text="Abrir…", command=self.abrir).pack(side="left", padx=3)
+        ttk.Button(bar, text="Salvar…", command=self.salvar).pack(side="left", padx=3)
+        ttk.Button(bar, text="Exemplo", command=self.carregar_exemplo).pack(side="left", padx=3)
+        ttk.Button(bar, text="Baixar Excel (.xlsx)", command=self.exportar_excel,
+                   style="Accent.TButton").pack(side="right", padx=3)
+        ttk.Button(bar, text="Exportar / Imprimir", command=self.exportar_html,
+                   style="Primary.TButton").pack(side="right", padx=3)
 
         # Corpo com duas colunas: formulário (scroll) + resultado
         corpo = ttk.Panedwindow(self, orient="horizontal")
@@ -146,7 +230,7 @@ class MapaApp(ttk.Frame):
 
     def _painel_scroll(self, parent):
         outer = ttk.Frame(parent)
-        canvas = Canvas(outer, highlightthickness=0)
+        canvas = Canvas(outer, highlightthickness=0, background=COR_BG)
         vsb = ttk.Scrollbar(outer, orient="vertical", command=canvas.yview)
         inner = ttk.Frame(canvas, padding=12)
         inner.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
@@ -270,8 +354,8 @@ class MapaApp(ttk.Frame):
         ent_dias2 = ttk.Entry(calcwrap, textvariable=self.var_calc_dias2, width=6)
         ent_dias2.grid(row=1, column=3, padx=(4, 0), pady=(4, 0))
         ent_dias2.bind("<Return>", lambda e: self._calcular_quebrada())
-        ttk.Button(calcwrap, text="Calcular", command=self._calcular_quebrada).grid(
-            row=0, column=4, rowspan=2, padx=(14, 0))
+        ttk.Button(calcwrap, text="Calcular", command=self._calcular_quebrada,
+                   style="Accent.TButton").grid(row=0, column=4, rowspan=2, padx=(14, 0))
         r += 1
         self.lbl_calc = ttk.Label(f, text="", font=("Segoe UI", 9, "bold"), foreground="#2f7d5b",
                                   justify="left", wraplength=520)
@@ -293,8 +377,8 @@ class MapaApp(ttk.Frame):
         ent_aulas = ttk.Entry(supwrap, textvariable=self.var_sup_aulas, width=6)
         ent_aulas.grid(row=0, column=3, padx=(4, 0))
         ent_aulas.bind("<Return>", lambda e: self._calcular_suplementar())
-        ttk.Button(supwrap, text="Calcular", command=self._calcular_suplementar).grid(
-            row=0, column=4, padx=(14, 0))
+        ttk.Button(supwrap, text="Calcular", command=self._calcular_suplementar,
+                   style="Accent.TButton").grid(row=0, column=4, padx=(14, 0))
         r += 1
         self.lbl_sup = ttk.Label(f, text="", font=("Segoe UI", 9, "bold"), foreground="#2f7d5b",
                                  justify="left", wraplength=520)
@@ -309,25 +393,33 @@ class MapaApp(ttk.Frame):
 
     def _construir_resultado(self, d):
         d.columnconfigure(0, weight=1)
-        ttk.Label(d, text="Mapa gerado", font=("Segoe UI", 11, "bold"),
-                  foreground="#16334f").grid(sticky="w")
-        self.txt_resumo = ttk.Label(d, justify="left", font=("Consolas", 9), anchor="nw")
-        self.txt_resumo.grid(sticky=(N, S, E, W), pady=8)
+        d.rowconfigure(1, weight=1)
+        ttk.Label(d, text="Mapa gerado", style="Secao.TLabel",
+                  font=("Segoe UI", 12, "bold")).grid(sticky="w", pady=(0, 8))
 
-        box = ttk.LabelFrame(d, text="10 · Média da Carga Horária", padding=10)
-        box.grid(sticky=(E, W), pady=6)
+        card = ttk.Frame(d, style="Card.TFrame", padding=16)
+        card.grid(sticky=(N, S, E, W))
+        card.columnconfigure(0, weight=1)
+        self.txt_resumo = ttk.Label(card, style="Card.TLabel", justify="left",
+                                    font=("Segoe UI", 9), anchor="nw")
+        self.txt_resumo.grid(sticky=(N, S, E, W), pady=(0, 12))
+
+        box = ttk.Labelframe(card, text="10 · Média da Carga Horária", padding=14,
+                             style="Card.TLabelframe")
+        box.grid(sticky=(E, W))
         for c in range(3):
             box.columnconfigure(c, weight=1)
-        self.lbl_media = ttk.Label(box, text="0", font=("Segoe UI", 22, "bold"), foreground="#16334f", anchor="center")
+        self.lbl_media = ttk.Label(box, text="0", style="Media.TLabel", font=("Segoe UI", 26, "bold"))
         self.lbl_media.grid(row=0, column=0)
-        self.lbl_jornada = ttk.Label(box, text="", font=("Segoe UI", 22, "bold"), foreground="#16334f", anchor="center")
+        self.lbl_jornada = ttk.Label(box, text="", style="Media.TLabel", font=("Segoe UI", 26, "bold"))
         self.lbl_jornada.grid(row=0, column=1)
-        self.lbl_supl = ttk.Label(box, text="", font=("Segoe UI", 22, "bold"), foreground="#16334f", anchor="center")
+        self.lbl_supl = ttk.Label(box, text="", style="MediaSup.TLabel", font=("Segoe UI", 26, "bold"))
         self.lbl_supl.grid(row=0, column=2)
-        ttk.Label(box, text="Média (Tit./OFA)", font=("Segoe UI", 7), anchor="center").grid(row=1, column=0, sticky=(E, W))
-        self.cap_jornada = ttk.Label(box, text="Jornada", font=("Segoe UI", 7), anchor="center")
+        ttk.Label(box, text="Média (Tit./OFA)", style="MediaCap.TLabel",
+                  font=("Segoe UI", 8)).grid(row=1, column=0, sticky=(E, W))
+        self.cap_jornada = ttk.Label(box, text="Jornada", style="MediaCap.TLabel", font=("Segoe UI", 8))
         self.cap_jornada.grid(row=1, column=1, sticky=(E, W))
-        self.cap_supl = ttk.Label(box, text="Carga Suplementar", font=("Segoe UI", 7), anchor="center")
+        self.cap_supl = ttk.Label(box, text="Carga Suplementar", style="MediaCap.TLabel", font=("Segoe UI", 8))
         self.cap_supl.grid(row=1, column=2, sticky=(E, W))
 
     # -------------------------------------------------------------- tabela
@@ -778,13 +870,10 @@ que retrata a minha opção nos termos do Art. 39 (das DDTT) da LC 836/97 ({res.
 def main():
     root = Tk()
     root.title(APP_TITULO)
-    root.geometry("1100x740")
-    root.minsize(920, 600)
+    root.geometry("1180x800")
+    root.minsize(960, 620)
+    configurar_tema(root)
     aplicar_icone(root)
-    try:
-        ttk.Style().theme_use("clam")
-    except Exception:
-        pass
     MapaApp(root)
     root.mainloop()
 
