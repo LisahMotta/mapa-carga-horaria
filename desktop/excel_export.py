@@ -165,9 +165,7 @@ def gerar_mapa_excel(dados: Dict, caminho: str) -> None:
         for jc in jornadas_carr
     )
     _merge(ws, f"B5:{tl}5")
-    _cell(ws, "B5",
-          f"Carreira: {dados.get('carreira_nome', '')}   —   Preencher Quadro:   {partes}",
-          font=F_TXT, align=ESQ)
+    _cell(ws, "B5", f"Preencher Quadro:   {partes}", font=F_TXT, align=ESQ)
     _merge(ws, f"B6:{tl}6")
     _cell(ws, "B6",
           f"Titular de Cargo atualmente incluído na Jornada {dados['jornada_nome']}, "

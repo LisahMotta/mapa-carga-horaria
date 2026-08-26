@@ -614,13 +614,12 @@ class MapaApp(ttk.Frame):
 
         vinc = "Titular de Cargo" if self.var_vinculo.get() == "titular" else "Ocupante de Função-Atividade (OFA)"
         info = self._info_jornada()
-        carr = CARREIRAS.get(self.var_carreira.get(), CARREIRAS["antiga"])["rotulo"]
         resumo = (
             f"Nome: {self.var_nome.get()}\n"
             f"RG: {self.var_rg.get()}\n"
             f"CPF: {self.var_cpf.get()}\n"
             f"Cargo: {self.var_cargo.get()}   Faixa/Nível: {self.var_faixa.get()}   DI: {self.var_di.get()}\n"
-            f"Vínculo: {vinc}   Carreira: {carr}\n"
+            f"Vínculo: {vinc}\n"
             f"Jornada atual: {info['nome']} (Tabela {info['tabela']}) — {info['horas']} horas\n"
             f"Período de opção: {res.n_meses} meses\n"
             f"7.A · Total geral: {res.total} horas\n"
@@ -847,7 +846,6 @@ class MapaApp(ttk.Frame):
         ativos = {chave(a, m) for a, m in meses}
         vinc = "Titular de Cargo" if self.var_vinculo.get() == "titular" else "Ocupante de Função-Atividade (OFA)"
         info = self._info_jornada()
-        carr = CARREIRAS.get(self.var_carreira.get(), CARREIRAS["antiga"])["rotulo"]
         jornada_txt = f"Jornada {info['nome']} — Tabela {info['tabela']} — {info['horas']} horas"
         nomeacao = escape(self._get_nomeacao()) or "<span style='color:#8a94a3'>Não há.</span>"
 
@@ -903,7 +901,7 @@ tfoot td{{background:#e6f2ec;font-weight:700;}}
 <div class='row r4'><div class='c'><small>3 · Cargo</small>{escape(self.var_cargo.get()) or '&nbsp;'}</div>
 <div class='c'><small>4 · Faixa/Nível</small>{escape(self.var_faixa.get()) or '&nbsp;'}</div>
 <div class='c'><small>4 · DI</small>{escape(self.var_di.get()) or '&nbsp;'}</div>
-<div class='c'><small>5 · Vínculo · Carreira</small>{vinc} · {carr}</div></div>
+<div class='c'><small>5 · Vínculo</small>{vinc}</div></div>
 <div class='row r3'><div class='c'><small>6 · Jornada atual</small>{jornada_txt}</div>
 <div class='c'><small>6 · Incluído a partir de</small>{escape(self.var_desde.get()) or '&nbsp;'}</div>
 <div class='c'><small>6 · DOE</small>{escape(self.var_doe.get()) or '&nbsp;'}</div></div>

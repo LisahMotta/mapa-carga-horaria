@@ -215,7 +215,6 @@ function esc(s) {
 function renderMapa() {
   const r = calcular();
   const vinc = state.vinculo === 'titular' ? 'Titular de Cargo' : 'Ocupante de Função-Atividade (OFA)';
-  const carreiraNome = (CARREIRAS[state.carreira] || CARREIRAS.antiga).rotulo;
 
   const anos = anosDoPeriodo(r.meses);
   const ativos = r.ativos;
@@ -278,7 +277,7 @@ function renderMapa() {
       <div class="mapa__cell"><span class="lbl">5 · Vínculo</span><span class="val">${vinc}</span></div>
     </div>
     <div class="mapa__row r-3">
-      <div class="mapa__cell"><span class="lbl">6 · Jornada atual (${esc(carreiraNome)})</span><span class="val">Jornada ${esc(state.jornadaNome)} — Tabela ${state.jornadaTabela} — ${state.jornada} horas</span></div>
+      <div class="mapa__cell"><span class="lbl">6 · Jornada atual</span><span class="val">Jornada ${esc(state.jornadaNome)} — Tabela ${state.jornadaTabela} — ${state.jornada} horas</span></div>
       <div class="mapa__cell"><span class="lbl">6 · Incluído a partir de</span><span class="val">${esc(state.jornadaDesde) || '&nbsp;'}</span></div>
       <div class="mapa__cell"><span class="lbl">6 · DOE</span><span class="val">${esc(state.doe) || '&nbsp;'}</span></div>
     </div>
