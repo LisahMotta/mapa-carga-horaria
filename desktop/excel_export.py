@@ -1,6 +1,6 @@
 """
 Geração do Mapa de Carga Horária em Excel (.xlsx), reproduzindo o layout do
-formulário oficial ANEXO III (SEDUC / DIPES / Unidade Regional de Ensino).
+formulário oficial ANEXO III (SEDUC / CoGEf / URE São José dos Campos).
 
 Depende de openpyxl. Mantido separado da interface para facilitar testes.
 """
@@ -52,7 +52,7 @@ OBS_TEXTO = [
     "C. Para períodos anteriores a 01/02/98, efetuar a equivalência entre horas e",
     "horas-aula - Consultar ANEXO I.",
     "D. Período anterior a 01/02/98 em regime de 40 horas não aplica equivalência.",
-    "Verificar sempre a SED para evitar divergências. Homologação: DVIF.",
+    "Verificar sempre a SED para evitar divergências. Homologação: URE São José dos Campos.",
 ]
 
 
@@ -124,7 +124,7 @@ def gerar_mapa_excel(dados: Dict, caminho: str) -> None:
 
     # ---- linha 2: subtítulo
     _merge(ws, f"A2:{tl}2")
-    _cell(ws, "A2", "SEDUC  /  DIPES  /  UNIDADE REGIONAL DE ENSINO",
+    _cell(ws, "A2", "SEDUC  /  CoGEf  /  URE SÃO JOSÉ DOS CAMPOS",
           font=F_SUB, align=CENTRO)
     ws.row_dimensions[2].height = 16
 
