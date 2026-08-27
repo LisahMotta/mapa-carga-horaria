@@ -1,6 +1,6 @@
 """
 Lógica de cálculo do Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria).
-ANEXO III — SEDUC / COGEF / URE São José dos Campos · Base: LC 836/97 (Art. 39 das DDTT).
+ANEXO III — SEDUC / CGRH / URE São José dos Campos · Base: LC 836/97 (Art. 39 das DDTT).
 
 Este módulo NÃO depende de interface gráfica, para permitir testes automatizados.
 """

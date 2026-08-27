@@ -1,6 +1,6 @@
 """
 Geração do Mapa de Carga Horária em Excel (.xlsx), reproduzindo o layout do
-formulário oficial ANEXO III (SEDUC / COGEF / URE São José dos Campos).
+formulário oficial ANEXO III (SEDUC / CGRH / URE São José dos Campos).
 
 Depende de openpyxl. Mantido separado da interface para facilitar testes.
 """
@@ -124,7 +124,7 @@ def gerar_mapa_excel(dados: Dict, caminho: str) -> None:
 
     # ---- linha 2: subtítulo
     _merge(ws, f"A2:{tl}2")
-    _cell(ws, "A2", "SEDUC  /  COGEF  /  URE SÃO JOSÉ DOS CAMPOS",
+    _cell(ws, "A2", "SEDUC  /  CGRH  /  URE SÃO JOSÉ DOS CAMPOS",
           font=F_SUB, align=CENTRO)
     ws.row_dimensions[2].height = 16
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
-Aplicativo desktop nativo (Tkinter) — ANEXO III · SEDUC / COGEF / URE São José dos Campos.
+Aplicativo desktop nativo (Tkinter) — ANEXO III · SEDUC / CGRH / URE São José dos Campos.
 
 Gera o Mapa de Carga Horária de docente para aposentadoria, com preenchimento
 mensal, cálculo automático da média e exportação para HTML (impressão/PDF).
@@ -204,7 +204,7 @@ class MapaApp(ttk.Frame):
         titw.pack(side="left", pady=(9, 9), anchor="w")
         Label(titw, text="Mapa de Carga Horária", bg=COR_BRAND, fg="white",
               font=("Segoe UI", 15, "bold")).pack(anchor="w")
-        Label(titw, text="ANEXO III · SEDUC / COGEF / URE São José dos Campos — cálculo de proventos",
+        Label(titw, text="ANEXO III · SEDUC / CGRH / URE São José dos Campos — cálculo de proventos",
               bg=COR_BRAND, fg="#c7d6e6", font=("Segoe UI", 9)).pack(anchor="w")
 
         # Barra de ações
@@ -894,7 +894,7 @@ tfoot td{{background:#e6f2ec;font-weight:700;}}
 @media print{{@page{{size:A4;margin:12mm;}}.badge{{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}}}
 </style></head><body>
 <div class='map'>
-<div class='hd'><h3>Mapa de Carga Horária</h3><small>ANEXO III · SEDUC / COGEF / URE São José dos Campos — cálculo de proventos</small></div>
+<div class='hd'><h3>Mapa de Carga Horária</h3><small>ANEXO III · SEDUC / CGRH / URE São José dos Campos — cálculo de proventos</small></div>
 <div class='row r3'><div class='c'><small>1 · Nome</small>{escape(self.var_nome.get()) or '&nbsp;'}</div>
 <div class='c'><small>2 · RG</small>{escape(self.var_rg.get()) or '&nbsp;'}</div>
 <div class='c'><small>2 · CPF</small>{escape(self.var_cpf.get()) or '&nbsp;'}</div></div>

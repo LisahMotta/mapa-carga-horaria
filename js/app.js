@@ -1,6 +1,6 @@
 /* ============================================================
    Mapa de Carga Horária — Cálculo de Proventos (Aposentadoria)
-   ANEXO III — SEDUC / COGEF / URE São José dos Campos
+   ANEXO III — SEDUC / CGRH / URE São José dos Campos
    Lógica de cálculo baseada na LC 836/97 (Art. 39 DDTT).
    ============================================================ */
 
@@ -262,7 +262,7 @@ function renderMapa() {
   const html = `
     <div class="mapa__head">
       <h3>Mapa de Carga Horária</h3>
-      <small>Quadro da carga horária para cálculo de proventos — ANEXO III · SEDUC / COGEF / URE São José dos Campos</small>
+      <small>Quadro da carga horária para cálculo de proventos — ANEXO III · SEDUC / CGRH / URE São José dos Campos</small>
     </div>
 
     <div class="mapa__row r-3">
